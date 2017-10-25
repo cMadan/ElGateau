@@ -1,6 +1,8 @@
 # ElGateau
-ElGateau: A Framework for using the Elgato Stream Deck for Experimental Psychology Research
+ElGateau: A Framework for Using the Elgato Stream Deck for Experimental Psychology Research
 
+This project is not associated in any way with Elgato Systems GmbH. 
+Emoji artwork is provided by EmojiOne (v2.3) and is licensed under CC-BY 4.0.
 
 ## To do list
 
@@ -38,3 +40,21 @@ ElGateau: A Framework for using the Elgato Stream Deck for Experimental Psycholo
 		+ Python 3
 
 1. Write as short paper for JOSS?
+
+## Existing APIs
+https://github.com/Lange/node-elgato-stream-deck
+https://github.com/danieltian/stream-deck-api
+
+https://github.com/OpenStreamDeck/StreamDeckSharp
+
+https://github.com/Number10Ox/stream-deck-driver
+https://github.com/GalacticGlum/StreamDeck
+https://github.com/WElRD/StreamDeckCore
+https://github.com/sammessina/csharp-elgato-stream-deck
+https://github.com/tchiak/NET-elgato-stream-deck
+
+## Dependencies
+pip install ...
+- hidapi
+- Pillow
+
