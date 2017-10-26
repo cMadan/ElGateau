@@ -1,20 +1,26 @@
 # ElGateau
 ElGateau: A Framework for Using the Elgato Stream Deck for Experimental Psychology Research
 
-This project is not associated in any way with Elgato Systems GmbH. 
-Emoji artwork is provided by EmojiOne (v2.3) and is licensed under CC-BY 4.0.
-
 ## To do list
 
 1. Build a basic API
 	- Reset screen -- DONE
 	- Detect button presses
-	- Update icons
+	- Update icons -- DONE
+		+ Separate icon 'preprocessing' (load/padding/resizing) from 'push to display'
+		+ Function to re-map key number to something more sensible
+		+ Write text to an icon
 	- Secondary functions
 		+ Modify brightness -- DONE
 	- Package code into a Python module
 
 1. Make simple proof-of-principle 'experiments'
+
+	- Demo script
+		+ Fill each key with an icon, spiral pattern
+		+ Write key number on each, pixel text
+		+ Key monitor waits for any key press
+			* Check that key is released
 
 	- Visual search
 		+ Record False alarms and RT (per trial)
@@ -57,4 +63,10 @@ https://github.com/tchiak/NET-elgato-stream-deck
 pip install ...
 - hidapi
 - Pillow
+
+### Disclaimer
+
+This project is not associated with Elgato Systems GmbH. 
+Emoji artwork is provided by EmojiOne (v2.3) and is licensed under CC-BY 4.0.
+(pixel font?)
 
