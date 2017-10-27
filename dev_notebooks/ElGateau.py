@@ -6,7 +6,7 @@ __author__      = "Christopher Madan"
 __copyright__   = "Copyright 2017, Christopher Madan"
 
 __license__ = "MIT"
-__version__ = "0.0.5"
+__version__ = "0.0.6"
 __maintainer__ = "Christopher Madan"
 __email__ = "christopher.madan@nottingham.ac.uk"
 __status__ = "Development"
@@ -85,6 +85,9 @@ def icon_text(ico,text,font='VeraMono-Bold',col='000000',size=14):
 
     # write text
     d.text((0,30), text, font=fnt, fill=(r,g,b,255))
+    # even after the recent patch, text align doesn't seem to work
+    # https://github.com/python-pillow/Pillow/pull/2641
+    # no error in PIL 4.3.0, but also doesn't seem to actually affect alignment
     
     # flatten background and text
     ico = Image.alpha_composite(base, txt)
@@ -112,6 +115,9 @@ def key_display(elg,key,ico):
         b = icobuffer[px][2]
         pixels = np.concatenate([pixels,np.array([b,g,r])])
 
+    # remap the key locations to make more sense
+    key = key_remap(key)
+    
     # send pixel data to elg
     header = HEADER_PAGE1
     header[5] = key
@@ -123,6 +129,10 @@ def key_display(elg,key,ico):
     msg = header+pixels[range((NUM_PAGE1_PIXELS-3)*3-1,NUM_TOTAL_PIXELS*3)].astype(int).tolist()
     elg.write(msg)
 
+def key_remap(key):
+    """remaps key numbers to a more intuitive order"""
+    key = (np.floor((key-1)/5))*5 + (5-(np.mod(key-1,5)))
+    return (int(key))
 
 
 
