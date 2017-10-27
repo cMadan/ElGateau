@@ -4,18 +4,23 @@ ElGateau: A Framework for Using the Elgato Stream Deck for Experimental Psycholo
 ## To do list
 
 1. Build a basic API
-	- Reset screen -- DONE
 	- Detect button presses
+		+ Listen for *next* press
+		+ Listen until specific key pressed
+		+ Listen until x key presses have been made
+		+ Record key press sequences and RT
+
+	- Reset screen -- DONE
 	- Update icons -- DONE
 		+ Separate icon 'preprocessing' (load/padding/resizing) from 'push to display' -- DONE
-		+ Function to re-map key number to something more sensible
+		+ Function to re-map key number to something more sensible -- DONE
 		+ Write text to an icon -- DONE
 			- https://github.com/chrissimpkins/codeface
 			- https://github.com/romeovs/creep
 			- https://github.com/MicahElliott/Orp-Font
 	- Secondary functions
 		+ Modify brightness -- DONE
-	- Package code into a Python module
+	- Package code into a Python module -- DONE
 
 1. Make simple proof-of-principle 'experiments'
 
