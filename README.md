@@ -7,9 +7,12 @@ ElGateau: A Framework for Using the Elgato Stream Deck for Experimental Psycholo
 	- Reset screen -- DONE
 	- Detect button presses
 	- Update icons -- DONE
-		+ Separate icon 'preprocessing' (load/padding/resizing) from 'push to display'
+		+ Separate icon 'preprocessing' (load/padding/resizing) from 'push to display' -- DONE
 		+ Function to re-map key number to something more sensible
-		+ Write text to an icon
+		+ Write text to an icon -- DONE
+			- https://github.com/chrissimpkins/codeface
+			- https://github.com/romeovs/creep
+			- https://github.com/MicahElliott/Orp-Font
 	- Secondary functions
 		+ Modify brightness -- DONE
 	- Package code into a Python module
@@ -40,6 +43,7 @@ ElGateau: A Framework for Using the Elgato Stream Deck for Experimental Psycholo
 	- Config, get subject number with sys.argv
 
 1. Make a windowed 'developer-mode' that doesn't require hardware??
+http://pygame.org/project/3267/5313
 
 1. Write up basic docs
 	- badges from shields.io
