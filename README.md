@@ -79,3 +79,4 @@ This project is not associated with Elgato Systems GmbH.
 Emoji artwork is provided by EmojiOne (v2.3) and is licensed under CC-BY 4.0.
 (pixel font?)
 
+:cake:
