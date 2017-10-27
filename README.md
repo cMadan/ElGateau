@@ -10,17 +10,17 @@ ElGateau: A Framework for Using the Elgato Stream Deck for Experimental Psycholo
 		+ Listen until x key presses have been made
 		+ Record key press sequences and RT
 
-	- Reset screen -- DONE
-	- Update icons -- DONE
-		+ ~~ Separate icon 'preprocessing' (load/padding/resizing) from 'push to display' ~~
-		+ ~~ Function to re-map key number to something more sensible ~~
-		+ ~~ Write text to an icon ~~
+	-~~Reset screen~~
+	-~~Update icons~~
+		+~~Separate icon 'preprocessing' (load/padding/resizing) from 'push to display'~~
+		+~~Function to re-map key number to something more sensible~~
+		+~~Write text to an icon~~
 			- https://github.com/chrissimpkins/codeface
 			- https://github.com/romeovs/creep
 			- https://github.com/MicahElliott/Orp-Font
 	- Secondary functions
-		+ ~~ Modify brightness ~~
-	- ~~ Package code into a Python module ~~
+		+~~Modify brightness~~
+	-~~Package code into a Python module~~
 
 1. Make simple proof-of-principle 'experiments'
 
