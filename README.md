@@ -1,6 +1,9 @@
 # ElGateau
 ElGateau: A Framework for Using the Elgato Stream Deck for Experimental Psychology Research
 
+Tested in Windows 10.
+(Later will test in Mac OS X 10.11.)
+
 ## To do list
 
 1. Build a basic API
@@ -14,6 +17,7 @@ ElGateau: A Framework for Using the Elgato Stream Deck for Experimental Psycholo
 	- ~~Update icons~~
 		+ ~~Separate icon 'preprocessing' (load/padding/resizing) from 'push to display'~~
 		+ ~~Function to re-map key number to something more sensible~~
+			- Allow for (row,column) notation too, also gets re-mapped
 		+ ~~Write text to an icon~~
 				* If ico=None, make it work with black background
 				* Have text location as 
@@ -31,17 +35,22 @@ ElGateau: A Framework for Using the Elgato Stream Deck for Experimental Psycholo
 		+ ~~Modify brightness~~
 	- ~~Package code into a Python module~~
 			- Rename 'inputs' to parameters
+			- Update naming for icon vs display
 
 	- Build some basic data logging functions
 		+ Open log file, parse subject ID with sys.argv
+			- only if None input, else use provided subject ID
 		+ Log all responses to a given trial (and RT), based on key listener primitive
 		+ Ability to push custom logs (e.g., for memory task, log initial positions, location of each icon name)
-			* timestamp, trial number, log record type ([K]ey,[C]ustom)
+			* timestamp, trial number, log record type ([D]isplay,[B]utton,[C]ustom)
 			* log startof button listeners and their end conditions?
 		+ Close log file
 			* Will require a log file handle to be stored
 
 	- Make a boot function (open, reset, draw {cake, 'ElGateau','cMadan',version}, some screen test, clear displays)
+
+	- Standard word use: Keys consist of Button and Display. Icons and Text can be written to Displays.
+
 
 1. Make simple proof-of-principle 'experiments'
 
@@ -60,6 +69,17 @@ ElGateau: A Framework for Using the Elgato Stream Deck for Experimental Psycholo
 		+ Shuffle R/G/B buttons across trials
 
 	- Devil task (look at paper again)
+		+ Use emoji font
+			* definitely: 1f608 or 1f47f (devil) or 1f4a3 (bomb), 1f4b5 (money in box), 1f4b0 (money total) 
+			* maybe: 229e (+ box), 1f3e6 (bank) 
+			* bank icon, trial number, amount saved (from previous trials) -- top row
+		+ https://stackoverflow.com/questions/11411746/drawing-multilingual-text-using-pil
+		
+		+ Brassen et al. (2012)
+			* "On each trial, an array of eight boxes was presented, where seven boxes con- tained a gain (“gold”) and one contained a loss (“devil”)."
+				- Will do 10 here
+			* "Boxes could be opened from left to right. At any stage, volunteers could either open the next box or stop and collect the gains ac- quired so far in this round. Exposing the random- ly distributed devil ended the trial, and all gains from this round were lost."
+			* "If volunteers decided to stop and collect their gains, the position of the devil was revealed, indicating how far they could have safely continued (“missed chance”)." 
 
 	- Memory game
 		+ Card flips, 7 pairs, etc.
@@ -75,7 +95,7 @@ http://pygame.org/project/3267/5313
 	- badges from shields.io
 		+ Python 3
 
-1. Write as short paper for JOSS?
+1. Write as short paper for JOSS? If not, maybe F1000Research?
 
 ## Existing APIs
 https://github.com/Lange/node-elgato-stream-deck
