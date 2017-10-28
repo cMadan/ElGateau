@@ -28,6 +28,14 @@ ElGateau: A Framework for Using the Elgato Stream Deck for Experimental Psycholo
 		+ ~~Modify brightness~~
 	- ~~Package code into a Python module~~
 
+	- Build some basic data logging functions
+		+ Open log file, parse subject ID with sys.argv
+		+ Log all responses to a given trial (and RT), based on key listener primitive
+		+ Ability to push custom logs (e.g., for memory task, log initial positions, location of each icon name)
+			* timestamp, log record type ([K]ey,[C]ustom)
+		+ Close log file
+			* Will require a log file handle to be stored
+
 1. Make simple proof-of-principle 'experiments'
 
 	- Demo script
