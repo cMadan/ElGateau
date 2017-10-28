@@ -15,7 +15,13 @@ ElGateau: A Framework for Using the Elgato Stream Deck for Experimental Psycholo
 		+ ~~Separate icon 'preprocessing' (load/padding/resizing) from 'push to display'~~
 		+ ~~Function to re-map key number to something more sensible~~
 		+ ~~Write text to an icon~~
+				* If ico=None, make it work with black background
+			- https://github.com/source-foundry/Hack
+			- https://github.com/jslegers/emoji-icon-font
+			- https://github.com/koemaeda/gohufont-ttf
+			- https://github.com/ranesr/SwiftIcons
 			- https://github.com/chrissimpkins/codeface
+			- https://github.com/Tecate/bitmap-fonts
 			- https://github.com/romeovs/creep
 			- https://github.com/MicahElliott/Orp-Font
 	- Secondary functions
