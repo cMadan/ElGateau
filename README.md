@@ -16,6 +16,9 @@ ElGateau: A Framework for Using the Elgato Stream Deck for Experimental Psycholo
 		+ ~~Function to re-map key number to something more sensible~~
 		+ ~~Write text to an icon~~
 				* If ico=None, make it work with black background
+				* Have text location as 
+				* Really no fix for centering text...??
+					+ https://github.com/python-pillow/Pillow/issues/2067
 			- https://github.com/source-foundry/Hack
 			- https://github.com/jslegers/emoji-icon-font
 			- https://github.com/koemaeda/gohufont-ttf
@@ -27,14 +30,18 @@ ElGateau: A Framework for Using the Elgato Stream Deck for Experimental Psycholo
 	- Secondary functions
 		+ ~~Modify brightness~~
 	- ~~Package code into a Python module~~
+			- Rename 'inputs' to parameters
 
 	- Build some basic data logging functions
 		+ Open log file, parse subject ID with sys.argv
 		+ Log all responses to a given trial (and RT), based on key listener primitive
 		+ Ability to push custom logs (e.g., for memory task, log initial positions, location of each icon name)
-			* timestamp, log record type ([K]ey,[C]ustom)
+			* timestamp, trial number, log record type ([K]ey,[C]ustom)
+			* log startof button listeners and their end conditions?
 		+ Close log file
 			* Will require a log file handle to be stored
+
+	- Make a boot function (open, reset, draw {cake, 'ElGateau','cMadan',version}, some screen test, clear displays)
 
 1. Make simple proof-of-principle 'experiments'
 
