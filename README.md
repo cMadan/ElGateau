@@ -31,11 +31,14 @@ Tested in Windows 10.
 			- https://github.com/Tecate/bitmap-fonts
 			- https://github.com/romeovs/creep
 			- https://github.com/MicahElliott/Orp-Font
+		+ 'clear key' that is an alias for fill with solid color of black
 	- Secondary functions
 		+ ~~Modify brightness~~
 	- ~~Package code into a Python module~~
+			- Change page info, reset, etc, from hex to dec
 			- Rename 'inputs' to parameters
 			- Update naming for icon vs display
+			- Add some additional structure/comments to the module to make it more interpretable
 
 	- Build some basic data logging functions
 		+ Open log file, parse subject ID with sys.argv
@@ -51,6 +54,7 @@ Tested in Windows 10.
 
 	- Standard word use: Keys consist of Button and Display. Icons and Text can be written to Displays.
 
+1. Reorganize useful links from above (other APIs, fonts) into a useful list
 
 1. Make simple proof-of-principle 'experiments'
 
@@ -70,6 +74,7 @@ Tested in Windows 10.
 
 	- Devil task (look at paper again)
 		+ Use emoji font
+			* http://jslegers.github.io/emoji-icon-font/
 			* definitely: 1f608 or 1f47f (devil) or 1f4a3 (bomb), 1f4b5 (money in box), 1f4b0 (money total) 
 			* maybe: 229e (+ box), 1f3e6 (bank) 
 			* bank icon, trial number, amount saved (from previous trials) -- top row
