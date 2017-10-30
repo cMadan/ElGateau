@@ -6,7 +6,7 @@ __author__      = "Christopher Madan"
 __copyright__   = "Copyright 2017, Christopher Madan"
 
 __license__ = "MIT"
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 __maintainer__ = "Christopher Madan"
 __email__ = "christopher.madan@nottingham.ac.uk"
 __status__ = "Development"
@@ -29,7 +29,7 @@ HEADER_PAGE1 = [0x02, 0x01, 0x01, 0x00, 0x00, 0, 0x00, 0x00,0x00, 0x00, 0x00, 0x
 HEADER_PAGE2 = [0x02, 0x01, 0x02, 0x00, 0x01, 0]
 
 # import dependencies
-import os, hid
+import os, hid, time
 import numpy as np
 from PIL import Image,ImageDraw,ImageFont
 
@@ -56,6 +56,12 @@ class ElGateau(object):
         # pre-generate a blank key for later functions
         self.KEY_BLANK = self.icon_solid();
 
+    def __exit_(self):
+        """
+        Close connection to Elgato Stream Deck device.
+        """
+        self.device.close()
+        
     def reset(self):
         """
         Send reset command.
@@ -114,11 +120,11 @@ class ElGateau(object):
 
         Parameters
         ----------
-        col: Hex color string for background.
+        col : Hex color string for background.
 
         Returns
         ----------
-        (r,g,b) tuple
+        (r,g,b) : tuple (0-255,0-255,0-255)
         """
         if type(col)==tuple:
             # assume this is RGB in (0-1) format
@@ -138,7 +144,7 @@ class ElGateau(object):
 
         Parameters
         ----------
-        col: Hex color string for background.
+        col : Hex color string for background.
 
         Returns
         ----------
@@ -176,7 +182,7 @@ class ElGateau(object):
         ico.thumbnail(ICON_SIZE)
         return (ico)
 
-    def icon_text(self,text,ico=None,col='ffffff',back='000000',font='VeraMono-Bold',size=14):
+    def icon_text(self,text,position=(31,31),ico=None,col='ffffff',back='000000',font='VeraMono-Bold',size=14):
         """
         Overlay text over icon.
 
@@ -187,13 +193,13 @@ class ElGateau(object):
         ico : 72x72 RGBA image
             Should have been output from icon_prep or icon_solid.
             Optional, defaults to black background.
-        col: Hex color code string for text.
+        col : Hex color code string for text.
             Optional, defaults to white ('ffffff').
-        back: Hex color string for background.
+        back : Hex color string for background.
             Optional, defaults to black ('000000').
-        font: Font filename, should be in "fonts" folder. 
+        font : Font filename, should be in "fonts" folder. 
             Optional, defaults to VeraMono-Bold.
-        size: Font size. 
+        size : Font size. 
             Optional, defaults to 14.
 
         Returns
@@ -219,10 +225,13 @@ class ElGateau(object):
         d = ImageDraw.Draw(txt)
 
         # write text
-        d.text((0,30), text, font=fnt, fill=(r,g,b,255))
         # even after the recent patch, text align doesn't seem to work
         # https://github.com/python-pillow/Pillow/pull/2641
         # no error in PIL 4.3.0, but also doesn't seem to actually affect alignment
+        w,h=d.textsize(text,font=fnt)
+        position = (position[0]-w/2,position[1])
+        # manual fix for centering
+        d.text(position, text, font=fnt, fill=(r,g,b,255))
 
         # flatten background and text
         ico = Image.alpha_composite(base, txt)
@@ -290,11 +299,34 @@ class ElGateau(object):
     # 
     # Key button functions
     #
-    # not implemented yet
+    # button_getch
+    # rest not implemented yet
     # 
     ########################################
 
-
-
+    def button_getch(self):
+        """
+        Detect button presses for the keys on the device.
+    
+        Returns
+        ----------
+        key : int, key number on device (1-15)
+        time  : tuple, unix time of key [0] monitoring start, [1] key press, and [2] key release
+        """
+        time_start = time.time()
+        # wait for button press
+        state = self.device.read(NUM_KEYS+1)
+        key = np.where(np.array(state) == 1)
+        key = self.key_remap(int(key[0][1]))
+        time_press = time.time()
+        # wait for release
+        state = self.device.read(NUM_KEYS+1)
+        if len(np.where(np.array(state) == 1)) > 1:
+            # no keys currently pressed
+            raise ValueError('Unexpected getch state.')
+        time_release = time.time()
+        
+        return (key,(time_start,time_press,time_release))
+        
 
 
