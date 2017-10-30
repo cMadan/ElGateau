@@ -31,14 +31,14 @@ Tested in Windows 10.
 			- https://github.com/Tecate/bitmap-fonts
 			- https://github.com/romeovs/creep
 			- https://github.com/MicahElliott/Orp-Font
-		+ 'clear key' that is an alias for fill with solid color of black
+		+ ~~'clear key' that is an alias for fill with solid color of black~~
 	- Secondary functions
 		+ ~~Modify brightness~~
 	- ~~Package code into a Python module~~
-			- Change page info, reset, etc, from hex to dec
-			- Rename 'inputs' to parameters
-			- Update naming for icon vs display
-			- Add some additional structure/comments to the module to make it more interpretable
+		+ Change page info, reset, etc, from hex to dec
+		+ Rename 'inputs' to parameters
+		+ Update naming for icon vs display
+		+ Add some additional structure/comments to the module to make it more interpretable
 
 	- Build some basic data logging functions
 		+ Open log file, parse subject ID with sys.argv
