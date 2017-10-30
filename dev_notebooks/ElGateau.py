@@ -6,11 +6,10 @@ __author__      = "Christopher Madan"
 __copyright__   = "Copyright 2017, Christopher Madan"
 
 __license__ = "MIT"
-__version__ = "0.0.8"
+__version__ = "0.1.0"
 __maintainer__ = "Christopher Madan"
 __email__ = "christopher.madan@nottingham.ac.uk"
 __status__ = "Development"
-
 
 # define constants
 HID_VENDOR = 4057
@@ -29,15 +28,20 @@ BRIGHTNESS_DATA = [0x05, 0x55, 0xAA, 0xD1, 0x01, 0x0A, 0, 0, 0, 0, 0, 0, 0, 0, 0
 HEADER_PAGE1 = [0x02, 0x01, 0x01, 0x00, 0x00, 0, 0x00, 0x00,0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x42, 0x4d, 0xf6, 0x3c, 0x00, 0x00, 0x00, 0x00,0x00, 0x00, 0x36, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x48, 0x00, 0x00, 0x00, 0x48, 0x00, 0x00, 0x00, 0x01, 0x00, 0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc0, 0x3c, 0x00, 0x00, 0xc4, 0x0e, 0x00, 0x00, 0xc4, 0x0e, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
 HEADER_PAGE2 = [0x02, 0x01, 0x02, 0x00, 0x01, 0]
 
-KEY_BLANK = icon_solid();
-
-
-# dependencies
+# import dependencies
 import os, hid
 import numpy as np
 from PIL import Image,ImageDraw,ImageFont
 
 # functions
+
+########################################
+# 
+# Basic device interaction functions
+# 
+# open, reset, set_brightness, key_remap
+# 
+########################################
 
 def open():
     """
@@ -52,12 +56,11 @@ def open():
     elg.open(HID_VENDOR, HID_PRODUCT)
     return (elg)
 
-
 def reset(elg):
     """
     Send reset command.
     
-    Inputs
+    Parameters
     ----------
     elg : USB HID handle
     """
@@ -67,7 +70,7 @@ def set_brightness(elg,bright):
     """
     Set brightness of displays.
     
-    Inputs
+    Parameters
     ----------
     elg : USB HID handle
     bright : int, 0-100
@@ -75,13 +78,90 @@ def set_brightness(elg,bright):
     """
     BRIGHTNESS_DATA[5] = bright
     elg.send_feature_report(BRIGHTNESS_DATA)
+
+def key_remap(key):
+    """
+    Remaps key numbers.
+    
+    Parameters
+    ----------
+    key : int, key number on device (1-15)
+    (5,4,3,2,1,10,9,8,7,6,15,14,13,12,11)
+    OR
+    (int,int) for (row,column) notation (1-3,1-5)
+
+    Returns
+    ----------
+    key : int, key number on device (1-15)
+    (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
+    """
+    if type(key) == int:
+        # simple remap of left-right ordering
+        key = (np.floor((key-1)/5))*5 + (5-(np.mod(key-1,5)))
+    elif type(key) == tuple:
+        # (r,c) notation
+        key = (key[0]-1)*5 + key[1]
+        key = key_remap(key) # still need to re-map ordering
+    return (int(key))    
     
     
+########################################
+# 
+# Icon generation functions
+#
+# icon_solid, icon_prep, icon_text
+# 
+########################################
+
+def hex2rgb(col):
+    """
+    Convert from hex color string to (r,g,b) tuple.
+    
+    Parameters
+    ----------
+    col: Hex color string for background.
+    
+    Returns
+    ----------
+    (r,g,b) tuple
+    """
+    if type(col)==tuple:
+        # assume this is RGB in (0-1) format
+        # not an intended input, but we can work with it
+        (r,g,b) = np.array(col)*255
+        return (r,g,b)
+    
+    # if preceded by a '#', remove it
+    col = col.replace('#','')
+    
+    (r,g,b)=bytes.fromhex(col)
+    return (r,g,b)
+
+def icon_solid(col='000000'):
+    """
+    Create a icon that is a solid color.
+    
+    Parameters
+    ----------
+    col: Hex color string for background.
+    
+    Returns
+    ----------
+    ico : 72x72 RGBA image
+    """
+    # make blank image of a solid color
+    (r,g,b)=hex2rgb(col)
+    ico = Image.new('RGBA', ICON_SIZE, (r,g,b,255))
+    return ico
+
+# pre-generate a blank key for later functions
+KEY_BLANK = icon_solid();
+
 def icon_prep(icon,pad=0):
     """
     Prepare icon (read from file, pad, resize).
     
-    Inputs
+    Parameters
     ----------
     icon : Filename for icon to prepare, needs to be a PNG in the "icons" folder.
     bright : px
@@ -104,34 +184,43 @@ def icon_prep(icon,pad=0):
     ico.thumbnail(ICON_SIZE)
     return (ico)
 
-
-def icon_text(ico,text,font='VeraMono-Bold',col='000000',size=14):
+def icon_text(text,ico=KEY_BLANK,col='ffffff',back='000000',font='VeraMono-Bold',size=14):
     """
     Overlay text over icon.
     
-    Inputs
+    Parameters
     ----------
-    ico : 72x72 RGBA image
-        Should have been output from icon_prep or icon_solid.
     text : str
         Text to write.
-    font: Font filename, should be in "fonts" folder. Optional.
-    col: Hex color code for text. Optional.
-    size: Font size. Optional.
+    ico : 72x72 RGBA image
+        Should have been output from icon_prep or icon_solid.
+        Optional, defaults to black background.
+    col: Hex color code string for text.
+        Optional, defaults to white ('ffffff').
+    back: Hex color string for background.
+        Optional, defaults to black ('000000').
+    font: Font filename, should be in "fonts" folder. 
+        Optional, defaults to VeraMono-Bold.
+    size: Font size. 
+        Optional, defaults to 14.
     
     Returns
     ----------
     ico : 72x72 RGBA image
     """
+    # make a solid color background if necessary
+    if back != '000000':
+        ico = icon_solid(back)
+        
     # underlay
     base = ico
-
+    
     # make a blank image for the text, initialized to transparent text color
     txt = Image.new('RGBA', base.size, (255,255,255,0))
 
     # setup font
     fnt = ImageFont.truetype(os.path.join("fonts",font+".ttf"), size)
-    (r,g,b)=bytes.fromhex(col)
+    (r,g,b)=hex2rgb(col)
     # get a drawing context
     d = ImageDraw.Draw(txt)
 
@@ -146,31 +235,24 @@ def icon_text(ico,text,font='VeraMono-Bold',col='000000',size=14):
     
     return (ico)
     
-def icon_solid(col='000000'):
-    """
-    Create a icon that is a solid color.
     
-    Inputs
-    ----------
-    col: Hex color string for text.
-    
-    Returns
-    ----------
-    ico : 72x72 RGBA image
-    """
-    # make blank image of a solid color
-    (r,g,b)=bytes.fromhex(col)
-    ico = Image.new('RGBA', ICON_SIZE, (r,g,b,255))
-    return ico
+########################################
+# 
+# Key display functions
+#
+# display_icon, display_clear
+# 
+########################################
 
-def key_display(elg,key,ico):
+def display_icon(elg,key,ico):
     """
-    Push an icon to a key on the device.
+    Push an icon to a key display on the device.
     
-    Inputs
+    Parameters
     ----------
     elg : USB HID handle
     key : int, key number on device (1-15)
+    OR key: tuple, key number in row,column notation (1-3,1-5)
     ico : 72x72 RGBA image
     """
     # icon gets written to display from right to left, 
@@ -200,41 +282,25 @@ def key_display(elg,key,ico):
     msg = header+pixels[range((NUM_PAGE1_PIXELS-3)*3-1,NUM_TOTAL_PIXELS*3)].astype(int).tolist()
     elg.write(msg)
 
-def key_clear(elg,key):
+def display_clear(elg,key):
     """
     Clears the display for a key on the device.
     
-    Inputs
+    Parameters
     ----------
     elg : USB HID handle
     key : int, key number on device (1-15)
     """
-    key_display(elg,key,KEY_CLEAR)
+    display_icon(elg,key,KEY_BLANK)
     
-def key_remap(key):
-    """
-    Remaps key numbers.
     
-    Inputs
-    ----------
-    key : int, key number on device (1-15)
-    (5,4,3,2,1,10,9,8,7,6,15,14,13,12,11)
-    OR
-    (int,int) for (row,column) notation (1-3,1-5)
-
-    Returns
-    ----------
-    key : int, key number on device (1-15)
-    (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
-    """
-    if len(key) == 1
-        # simple remap of left-right ordering
-        key = (np.floor((key-1)/5))*5 + (5-(np.mod(key-1,5)))
-    elif len(key) == 2
-        # (r,c) notation
-        key = (key[0]-1)*5 + key[1]
-    return (int(key))
-
+########################################
+# 
+# Key button functions
+#
+# not implemented yet
+# 
+########################################
 
 
 
