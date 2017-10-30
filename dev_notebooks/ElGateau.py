@@ -6,7 +6,7 @@ __author__      = "Christopher Madan"
 __copyright__   = "Copyright 2017, Christopher Madan"
 
 __license__ = "MIT"
-__version__ = "0.0.7"
+__version__ = "0.0.8"
 __maintainer__ = "Christopher Madan"
 __email__ = "christopher.madan@nottingham.ac.uk"
 __status__ = "Development"
@@ -28,6 +28,9 @@ BRIGHTNESS_DATA = [0x05, 0x55, 0xAA, 0xD1, 0x01, 0x0A, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 HEADER_PAGE1 = [0x02, 0x01, 0x01, 0x00, 0x00, 0, 0x00, 0x00,0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x42, 0x4d, 0xf6, 0x3c, 0x00, 0x00, 0x00, 0x00,0x00, 0x00, 0x36, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x48, 0x00, 0x00, 0x00, 0x48, 0x00, 0x00, 0x00, 0x01, 0x00, 0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc0, 0x3c, 0x00, 0x00, 0xc4, 0x0e, 0x00, 0x00, 0xc4, 0x0e, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
 HEADER_PAGE2 = [0x02, 0x01, 0x02, 0x00, 0x01, 0]
+
+KEY_BLANK = icon_solid();
+
 
 # dependencies
 import os, hid
@@ -143,13 +146,13 @@ def icon_text(ico,text,font='VeraMono-Bold',col='000000',size=14):
     
     return (ico)
     
-def icon_solid(col):
+def icon_solid(col='000000'):
     """
     Create a icon that is a solid color.
     
     Inputs
     ----------
-    col: Hex color code for text.
+    col: Hex color string for text.
     
     Returns
     ----------
@@ -170,7 +173,8 @@ def key_display(elg,key,ico):
     key : int, key number on device (1-15)
     ico : 72x72 RGBA image
     """
-    # icon gets mirrored, so need to flip
+    # icon gets written to display from right to left, 
+    # so need to mirror it before sending so it looks correct
     ico = ico.transpose(Image.FLIP_LEFT_RIGHT)
 
     # buffer pixel data into a list and shuffle colors to BGR
@@ -196,21 +200,39 @@ def key_display(elg,key,ico):
     msg = header+pixels[range((NUM_PAGE1_PIXELS-3)*3-1,NUM_TOTAL_PIXELS*3)].astype(int).tolist()
     elg.write(msg)
 
+def key_clear(elg,key):
+    """
+    Clears the display for a key on the device.
+    
+    Inputs
+    ----------
+    elg : USB HID handle
+    key : int, key number on device (1-15)
+    """
+    key_display(elg,key,KEY_CLEAR)
+    
 def key_remap(key):
     """
-    Remaps key numbers to a more intuitive order.
+    Remaps key numbers.
     
     Inputs
     ----------
     key : int, key number on device (1-15)
     (5,4,3,2,1,10,9,8,7,6,15,14,13,12,11)
+    OR
+    (int,int) for (row,column) notation (1-3,1-5)
 
     Returns
     ----------
     key : int, key number on device (1-15)
     (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
     """
-    key = (np.floor((key-1)/5))*5 + (5-(np.mod(key-1,5)))
+    if len(key) == 1
+        # simple remap of left-right ordering
+        key = (np.floor((key-1)/5))*5 + (5-(np.mod(key-1,5)))
+    elif len(key) == 2
+        # (r,c) notation
+        key = (key[0]-1)*5 + key[1]
     return (int(key))
 
 
