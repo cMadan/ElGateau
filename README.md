@@ -14,10 +14,10 @@ Tested in Windows 10.
 			+ ~~Function to re-map key number to something more sensible~~
 				- ~~Allow for (row,column) notation too, also gets re-mapped~~
 			+ ~~Write text to an icon~~
-					* ~~If ico=None, make it work with black background~~
-					* ~~Have text location as parameter~~ 
-					* ~~Really no fix for centering text...??~~
-						+ https://github.com/python-pillow/Pillow/issues/2067
+				* ~~If ico=None, make it work with black background~~
+				* ~~Have text location as parameter~~ 
+				* ~~Really no fix for centering text...??~~
+					+ https://github.com/python-pillow/Pillow/issues/2067
 			+ ~~'clear key' that is an alias for fill with solid color of black~~
 				- ~~ICON_BLANK as a constant, use in the ico=None case too~~
 		- Secondary functions
@@ -52,6 +52,7 @@ Tested in Windows 10.
 			+ Record key press sequences and RT
 
 		- Build some basic data logging functions
+			+ Maybe this should be a nested class?
 			+ Open log file, parse subject ID with sys.argv
 				- only if None input, else use provided subject ID
 			+ Log all responses to a given trial (and RT), based on key listener primitive
@@ -113,21 +114,22 @@ http://pygame.org/project/3267/5313
 1. Write as short paper for JOSS? If not, maybe F1000Research?
 
 ## Existing APIs
-https://github.com/Lange/node-elgato-stream-deck
-https://github.com/danieltian/stream-deck-api
+- https://github.com/Lange/node-elgato-stream-deck
+- https://github.com/danieltian/stream-deck-api
 
-https://github.com/OpenStreamDeck/StreamDeckSharp
+- https://github.com/OpenStreamDeck/StreamDeckSharp
 
-https://github.com/Number10Ox/stream-deck-driver
-https://github.com/GalacticGlum/StreamDeck
-https://github.com/WElRD/StreamDeckCore
-https://github.com/sammessina/csharp-elgato-stream-deck
-https://github.com/tchiak/NET-elgato-stream-deck
+- https://github.com/Number10Ox/stream-deck-driver
+- https://github.com/GalacticGlum/StreamDeck
+- https://github.com/WElRD/StreamDeckCore
+- https://github.com/sammessina/csharp-elgato-stream-deck
+- https://github.com/tchiak/NET-elgato-stream-deck
+
 
 ## Dependencies
 pip install ...
-- hidapi
-- Pillow
+- hidapi [https://github.com/trezor/cython-hidapi/blob/master/hid.pyx]
+- Pillow [http://pillow.readthedocs.io/en/latest/index.html]
 
 ### Disclaimer
 
