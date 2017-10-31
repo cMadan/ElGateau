@@ -6,7 +6,7 @@ __author__      = "Christopher Madan"
 __copyright__   = "Copyright 2017, Christopher Madan"
 
 __license__ = "MIT"
-__version__ = "0.3.0"
+__version__ = "0.3.2"
 __maintainer__ = "Christopher Madan"
 __email__ = "christopher.madan@nottingham.ac.uk"
 __status__ = "Development"
@@ -15,18 +15,18 @@ __status__ = "Development"
 HID_VENDOR = 4057
 HID_PRODUCT = 96
 
-NUM_KEYS = 15;
+NUM_KEYS = 15
 ICON_SIZE = 72,72
 
-NUM_TOTAL_PIXELS = ICON_SIZE[0]*ICON_SIZE[1];
-NUM_PAGE1_PIXELS = 2583;
-NUM_PAGE2_PIXELS = NUM_TOTAL_PIXELS-NUM_PAGE1_PIXELS;
+NUM_TOTAL_PIXELS = ICON_SIZE[0]*ICON_SIZE[1]
+NUM_PAGE1_PIXELS = 2583
+NUM_PAGE2_PIXELS = NUM_TOTAL_PIXELS-NUM_PAGE1_PIXELS
 
-RESET_DATA = [0x0B, 0x63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-BRIGHTNESS_DATA = [0x05, 0x55, 0xAA, 0xD1, 0x01, 0x0A, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+RESET_DATA = [11,99,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+BRIGHTNESS_DATA = [5,85,170,209,1,10,0,0,0,0,0,0,0,0,0,0,0]
 
-HEADER_PAGE1 = [0x02, 0x01, 0x01, 0x00, 0x00, 0, 0x00, 0x00,0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x42, 0x4d, 0xf6, 0x3c, 0x00, 0x00, 0x00, 0x00,0x00, 0x00, 0x36, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x48, 0x00, 0x00, 0x00, 0x48, 0x00, 0x00, 0x00, 0x01, 0x00, 0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc0, 0x3c, 0x00, 0x00, 0xc4, 0x0e, 0x00, 0x00, 0xc4, 0x0e, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
-HEADER_PAGE2 = [0x02, 0x01, 0x02, 0x00, 0x01, 0]
+HEADER_PAGE1 = [2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,66,77,246,60,0,0,0,0,0,0,54,0,0,0,40,0,0,0,72,0,0,0,72,0,0,0,1,0,24,0,0,0,0,0,192,60,0,0,196,14,0,0,196,14,0,0,0,0,0,0,0,0,0,0]
+HEADER_PAGE2 = [2,1,2,0,1,0,0,0,0,0,0,0,0,0,0,0]
 
 # import dependencies
 import os, hid, time
@@ -229,7 +229,7 @@ class ElGateau(object):
         # https://github.com/python-pillow/Pillow/pull/2641
         # no error in PIL 4.3.0, but also doesn't seem to actually affect alignment
         w,h=d.textsize(text,font=fnt)
-        position = (position[0]-w/2,position[1])
+        position = (position[0]-w/2+4,position[1]-h/2)
         # manual fix for centering
         d.text(position, text, font=fnt, fill=(r,g,b,255))
 
@@ -281,7 +281,7 @@ class ElGateau(object):
 
         header = HEADER_PAGE2
         header[5] = key
-        msg = header+pixels[range((NUM_PAGE1_PIXELS-3)*3-1,NUM_TOTAL_PIXELS*3)].astype(int).tolist()
+        msg = header+pixels[range((NUM_PAGE1_PIXELS*3),NUM_TOTAL_PIXELS*3)].astype(int).tolist()
         self.device.write(msg)
 
     def display_clear(self,key):
@@ -291,8 +291,23 @@ class ElGateau(object):
         Parameters
         ----------
         key : int, key number on device (1-15)
+            OR list or 'all'
+            
         """
-        self.display_icon(key,self.KEY_BLANK)
+        if key == 'all':
+            #key = list(range(1,16))
+            # list(range) works, but is slow
+            # let's be more responsive
+            self.reset()
+            self.display_clear(1)
+            return
+            
+        if type(key) == list:
+            for k in key:
+                self.display_icon(k,self.KEY_BLANK)
+        else:
+            # if it's a tuple in (r,c) format, we want to respect that still
+            self.display_icon(key,self.KEY_BLANK)
 
 
     ########################################
@@ -311,14 +326,14 @@ class ElGateau(object):
         Returns
         ----------
         key : int, key number on device (1-15)
-        time  : tuple, unix time of key [0] monitoring start, [1] key press, and [2] key release
+        time  : tuple, unix time of key [0] key press, and [1] key release
         """
-        time_start = time.time()
         # wait for button press
         state = self.device.read(NUM_KEYS+1)
         key = np.where(np.array(state) == 1)
         key = self.key_remap(int(key[0][1]))
         time_press = time.time()
+        
         # wait for release
         state = self.device.read(NUM_KEYS+1)
         if len(np.where(np.array(state) == 1)) > 1:
@@ -326,7 +341,7 @@ class ElGateau(object):
             raise ValueError('Unexpected getch state.')
         time_release = time.time()
         
-        return (key,(time_start,time_press,time_release))
+        return (key,(time_press,time_release))
         
 
 
