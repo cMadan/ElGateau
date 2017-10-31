@@ -20,6 +20,8 @@ Tested in Windows 10.
 					+ https://github.com/python-pillow/Pillow/issues/2067
 			+ ~~'clear key' that is an alias for fill with solid color of black~~
 				- ~~ICON_BLANK as a constant, use in the ico=None case too~~
+			- ~~Fix Page 2 header code, should be longer, then can fix start number for pixels being sent~~
+				+ ~~Change page info, reset, etc, from hex to dec~~
 		- Secondary functions
 			+ ~~Modify brightness~~
 		- ~~Package code into a Python module~~
@@ -29,9 +31,6 @@ Tested in Windows 10.
 	- IN PROGRESS
 		- Standard word use: Keys consist of Button and Display. Icons and Text can be written to Displays.
 			- Update naming for icon vs display
-
-		- Fix Page 2 header code, should be longer, then can fix start number for pixels being sent
-			+ Change page info, reset, etc, from hex to dec
 
 		- Look into fonts more
 			- https://github.com/source-foundry/Hack
@@ -45,7 +44,7 @@ Tested in Windows 10.
 
 		- Detect button presses
 			+ ~~Listen for *next* press~~
-				* Remove the start time in getch
+				* ~~Remove the start time in getch~~
 
 			+ Listen until specific key pressed
 			+ Listen until x key presses have been made
