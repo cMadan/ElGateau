@@ -71,8 +71,11 @@ class ElGateau(object):
 
         # pre-generate a blank key for later functions
         self.KEY_BLANK = self.icon_solid()
+    
+    def __enter__(self):
+        return self
 
-    def __exit_(self):
+    def __exit__(self):
         """
         Close connection to Elgato Stream Deck device.
         """
