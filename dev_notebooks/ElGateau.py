@@ -71,7 +71,7 @@ class ElGateau(object):
 
         # pre-generate a blank key for later functions
         self.KEY_BLANK = self.icon_solid()
-    
+
     def __enter__(self):
         return self
 
@@ -122,7 +122,7 @@ class ElGateau(object):
             # (r,c) notation
             key = (key[0]-1)*5 + key[1]
             key = self.key_remap(key)  # still need to re-map ordering
-        return (int(key))
+        return int(key)
 
     ########################################
     #
@@ -134,7 +134,7 @@ class ElGateau(object):
 
     def hex2rgb(self, col):
         """
-        Convert from hex color string to (r,g,b) tuple.
+        Convert from hex color string to RGB tuple.
 
         Parameters
         ----------
@@ -142,19 +142,19 @@ class ElGateau(object):
 
         Returns
         ----------
-        (r,g,b) : tuple (0-255,0-255,0-255)
+        color : RGB tuple (0-255,0-255,0-255)
         """
         if type(col) == tuple:
             # assume this is RGB in (0-1) format
             # not an intended input, but we can work with it
-            (r, g, b) = np.array(col)*255
-            return (r, g, b)
+            rgb = np.array(col)*255
+            return rgb
 
         # if preceded by a '#', remove it
         col = col.replace('#', '')
 
-        (r, g, b) = bytes.fromhex(col)
-        return (r, g, b)
+        rgb = tuple(bytes.fromhex(col))
+        return rgb
 
     def icon_solid(self, col='000000'):
         """
@@ -169,8 +169,8 @@ class ElGateau(object):
         ico : 72x72 RGBA image
         """
         # make blank image of a solid color
-        (r, g, b) = self.hex2rgb(col)
-        ico = Image.new('RGBA', ICON_SIZE, (r, g, b, 255))
+        rgb = self.hex2rgb(col)
+        ico = Image.new('RGBA', ICON_SIZE, rgb+(255,))
         return ico
 
     def icon_prep(self, icon, pad=0):
@@ -201,7 +201,7 @@ class ElGateau(object):
 
         # ensure final image is 72x72
         ico.thumbnail(ICON_SIZE)
-        return (ico)
+        return ico
 
     def icon_text(self, text, position=(31, 31), ico=None, col='ffffff',
                   back='000000', font='VeraMono-Bold', size=14):
@@ -243,24 +243,24 @@ class ElGateau(object):
 
         # setup font
         fnt = ImageFont.truetype(os.path.join("fonts", font+".ttf"), size)
-        (r, g, b) = self.hex2rgb(col)
+        rgb = self.hex2rgb(col)
         # get a drawing context
-        d = ImageDraw.Draw(txt)
+        draw = ImageDraw.Draw(txt)
 
         # write text
         # even after the recent patch, text align doesn't seem to work
         # https://github.com/python-pillow/Pillow/pull/2641
         # no error in PIL 4.3.0,
         # but also doesn't seem to actually affect alignment
-        w, h = d.textsize(text, font=fnt)
-        position = (position[0]-w/2+4, position[1]-h/2)
+        width, height = draw.textsize(text, font=fnt)
+        position = (position[0]-width/2+4, position[1]-height/2)
         # manual fix for centering
-        d.text(position, text, font=fnt, fill=(r, g, b, 255))
+        draw.text(position, text, font=fnt, fill=rgb+(255,))
 
         # flatten background and text
         ico = Image.alpha_composite(base, txt)
 
-        return (ico)
+        return ico
 
     ########################################
     #
@@ -287,10 +287,10 @@ class ElGateau(object):
         # buffer pixel data into a list and shuffle colors to BGR
         icobuffer = list(ico.getdata())  # RGBA
         pixels = np.array([])
-        for px in range(0, NUM_TOTAL_PIXELS):
-            r = icobuffer[px][0]
-            g = icobuffer[px][1]
-            b = icobuffer[px][2]
+        for pixel in range(0, NUM_TOTAL_PIXELS):
+            r = icobuffer[pixel][0]
+            g = icobuffer[pixel][1]
+            b = icobuffer[pixel][2]
             pixels = np.concatenate([pixels, np.array([b, g, r])])
 
         # remap the key locations to make more sense
