@@ -18,7 +18,7 @@ __author__ = "Christopher Madan"
 __copyright__ = "Copyright 2017, Christopher Madan"
 
 __license__ = "MIT"
-__version__ = "0.3.5"
+__version__ = "0.4.1"
 __maintainer__ = "Christopher Madan"
 __email__ = "christopher.madan@nottingham.ac.uk"
 __status__ = "Development"
@@ -291,16 +291,22 @@ class ElGateau(object):
                                     NUM_TOTAL_PIXELS*3)].astype(int).tolist()
         self.device.write(msg)
 
-    def display_clear(self, key):
+    def display_clear(self, keys, rc=False):
         """
         Clears the display for a key on the device.
 
         Parameters
         ----------
-        key : int, key number on device (1-15)
-            OR list or 'all'
+        keys : int, key number on device (1-15)
+            OR list (e.g., (1,4,12)) 
+            OR 'all'
+        
+        rc : boolean, Use the r,c (row,column) notation or not
+            If rc=True, list of keys must be lists of tuples
+            E.g., ((1,1),(1,4),(3,2))
+            
         """
-        if key == 'all':
+        if keys == 'all':
             # key = list(range(1,16))
             # list(range) works, but is slow
             # let's be more responsive
@@ -308,25 +314,36 @@ class ElGateau(object):
             self.display_clear(1)
             return
 
-        if isinstance(key, list):
-            for k in key:
+        if rc == False:
+            if isinstance(keys, int):
+                keys = (keys,)
+            for k in keys:
                 self.display_icon(k, self.key_blank)
-        else:
-            # if it's a tuple in (r,c) format, we want to respect that still
-            self.display_icon(key, self.key_blank)
 
+        if rc == True:
+            # if it's a tuple in (r,c) format
+            if isinstance(keys[0], int):
+                keys = (keys,)
+            for k in keys:
+                self.display_icon(k, self.key_blank)
+                
     ########################################
     #
     # Key button functions
     #
-    # button_getch, button_listen_key, button_listen_count
+    # button_getch, button_clear,
+    # button_listen_key, button_listen_count
     #
     ########################################
 
-    def button_getch(self):
+    def button_getch(self,remap=True):
         """
         Detect button presses for the keys on the device.
 
+        Parameters
+        ----------
+        remap : boolean, use the remapping or not
+        
         Returns
         ----------
         key : int, Key number on device (1-15)
@@ -335,7 +352,9 @@ class ElGateau(object):
         # wait for button press
         state = self.device.read(NUM_KEYS+1)
         key = np.where(np.array(state) == 1)
-        key = self.key_remap(int(key[0][1]))
+        key = int(key[0][1])
+        if remap == True:
+            key = self.key_remap(key)
         time_press = time.time()
 
         # wait for release
@@ -346,20 +365,42 @@ class ElGateau(object):
         time_release = time.time()
 
         return (key, (time_press, time_release))
+    
+    def button_empty(self, timeout=5):
+        """
+        Device buffers button presses, so can carry over to following getch.
+        Need to empty the buffer.
+        
+        Parameters
+        ----------
+        timeout : int, How many ms to wait for device. Optional.
+        """
+        state = [0]
+        while len(state) > 0:
+            # hid.device.read has a timeount parameter!!
+            state = self.device.read(NUM_KEYS+1, timeout_ms=timeout)
 
-    def button_listen_key(self, keys):
+    def button_listen_key(self, keys, rc=False):
         """
         Listen for specified key to be pressed.
 
         Parameters
         ----------
-        keys : int or list, Key(s) to listen for
+        keys : int or list of ints, Key(s) to listen for
+            E.g., (1,4,12)
+
+        rc : boolean, Use the r,c (row,column) notation or not
+            If rc=True, list of keys must be lists of tuples
+            E.g., ((1,1),(1,4),(3,2))
 
         Returns
         ----------
-        button : int, Key detected
+        button : int, Key detected (1-15)
+            If rc=True, will return tuple in same format
         response_time : float, Time between listen initiated and button press
         """
+        # empty device buffer
+        self.button_empty()
         # get time for starting to listen
         time_start = time.time()
         # initiate button with 0, since no presses just yet
@@ -367,8 +408,16 @@ class ElGateau(object):
 
         # listen
         # only accepts certain key responses
-        while button not in keys:
-            button, button_time = self.button_getch()
+        if rc == False:
+            if isinstance(keys, int):
+                keys = (keys,)
+            while button not in keys:
+                button, button_time = self.button_getch()
+
+        elif rc == True:
+            # not implemented yet
+            1==1
+       
         # only output the button press time
         response_time = button_time[0]-time_start
 
@@ -387,6 +436,8 @@ class ElGateau(object):
         key_list : list, keys pressed
         rt_list : list, time between listen initiated and each press
         """
+        # empty device buffer
+        self.button_empty()
         # get time for starting to listen
         time_start = time.time()
         # define the counting variable
