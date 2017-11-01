@@ -225,19 +225,12 @@ class ElGateau(object):
         draw = ImageDraw.Draw(txt)
 
         # write text
-
-        # even after the recent patch, text align doesn't seem to work
-        # https://github.com/python-pillow/Pillow/pull/2641
-        # no error in PIL 4.3.0,
-        # but also doesn't seem to actually affect alignment
-
-        # manual fix for centering
         width, height = draw.textsize(text, font=fnt)
-        position = (position[0]-width/2+4, position[1]-height/2)
+        position = (position[0]-width/2+4, position[1]-height/2+4)
         # convert location positions to int (rather than float)
         position = tuple(map(int, position))
 
-        draw.text(position, text, font=fnt, fill=rgb+(255,))
+        draw.text(position, text, font=fnt, fill=rgb+(255,), align='center')
 
         # flatten background and text
         ico = Image.alpha_composite(base, txt)
