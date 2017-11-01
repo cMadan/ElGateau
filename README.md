@@ -20,6 +20,8 @@ Tested in Windows 10.
 					+ https://github.com/python-pillow/Pillow/issues/2067
 			+ ~~'clear key' that is an alias for fill with solid color of black~~
 				- ~~ICON_BLANK as a constant, use in the ico=None case too~~
+				- ~~Add option to clear several keys at once~~
+				- ~~Add an 'all' option to clear all keys~~
 			- ~~Fix Page 2 header code, should be longer, then can fix start number for pixels being sent~~
 				+ ~~Change page info, reset, etc, from hex to dec~~
 		- Secondary functions
@@ -46,8 +48,8 @@ Tested in Windows 10.
 			+ ~~Listen for *next* press~~
 				* ~~Remove the start time in getch~~
 
-			+ Listen until specific key pressed
-			+ Listen until x key presses have been made
+			+ Listen until specific key pressed (button_listen_specific(key))
+			+ Listen until x key presses have been made (button_listen_count(n))
 			+ Record key press sequences and RT
 
 		- Build some basic data logging functions
