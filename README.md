@@ -4,6 +4,10 @@ ElGateau: A Framework for Using the Elgato Stream Deck for Experimental Psycholo
 Tested in Windows 10.
 (Later will test in Mac OS X 10.11.)
 
+The Elgato Stream Deck is effectively a USB interface device with an rray of 3x5 keys. Each key has an LCD display (72x72 px resolution) on the face of it, and has physical buttons that can be pressed and released. This project is a Python API for this device (updating displays, listen for button presses), along with supporting functionality (e.g., writing text to the display, 'preprocessing' images before writing to display, monitoring for specific button presses). On top of this base functionality, the 'framework' also includes higher-level functions to support using this device in experimental psychology research, such as logging display updates and key presses as well as storing internal representations of the current displays on the device.
+
+![Elgato Stream Deck](https://cdn.vox-cdn.com/uploads/chorus_image/image/54298497/91fukDTbNVL._SL1500_.0.jpg)
+
 ## To do list
 
 1. Build a basic API
@@ -29,6 +33,12 @@ Tested in Windows 10.
 		- ~~Package code into a Python module~~
 			+ ~~Rename 'inputs' to parameters~~
 			+ ~~Add some additional structure/comments to the module to make it more interpretable~~
+		- ~~Detect button presses~~
+			+ ~~Listen for *next* press~~
+				* ~~Remove the start time in getch~~
+			+ ~~Listen until specific key pressed (button_listen_specific(key))~~
+			+ ~~Listen until x key presses have been made (button_listen_count(n))~~
+			+ ~~Record key press sequences and RT~~
 
 	- IN PROGRESS
 		- Standard word use: Keys consist of Button and Display. Icons and Text can be written to Displays.
@@ -44,14 +54,6 @@ Tested in Windows 10.
 			- https://github.com/romeovs/creep
 			- https://github.com/MicahElliott/Orp-Font
 
-		- Detect button presses
-			+ ~~Listen for *next* press~~
-				* ~~Remove the start time in getch~~
-
-			+ Listen until specific key pressed (button_listen_specific(key))
-			+ Listen until x key presses have been made (button_listen_count(n))
-			+ Record key press sequences and RT
-
 		- Build some basic data logging functions
 			+ Maybe this should be a nested class?
 			+ Open log file, parse subject ID with sys.argv
@@ -65,6 +67,8 @@ Tested in Windows 10.
 
 		- Make a boot function (open, reset, draw {cake, 'ElGateau','cMadan',version}, some screen test, clear displays)
 
+		- Create an internal variable that maintains information about what is being displayed on the buttons, at the very least generic ('icon', 'text', 'blank') but could also be user-specified information ('cake','points')
+			+ Would need to be added into the ico variable, maybe should make ico into it's own class?
 
 1. Reorganize useful links from above (other APIs, fonts) into a useful list
 
@@ -81,8 +85,13 @@ Tested in Windows 10.
 		+ Presents 15 different icons, find the target one, press
 
 	- Match color
-		+ Prints color "red", "green", "blue" to command window, have to press designated button
-		+ Shuffle R/G/B buttons across trials
+		+ ~~Prints color "red", "green", "blue" to command window, have to press designated button~~
+		+ ~~Shuffle R/G/B buttons across trials~~
+		+ Make colors flicker to make it a bit more engaging
+		+ Change how shuffling works, show color label before flickering happens
+			* Set 'flickering' to occur a random amount within a range
+		+ Add extra colors? (pink, purple, orange, yellow, brown) -- not sure...
+			* Use Brewer colors?
 
 	- Devil task (look at paper again)
 		+ Use emoji font
