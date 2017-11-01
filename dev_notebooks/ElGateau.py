@@ -236,7 +236,7 @@ class ElGateau(object):
         position = (position[0]-width/2+4, position[1]-height/2)
         # convert location positions to int (rather than float)
         position = tuple(map(int, position))
-        
+
         draw.text(position, text, font=fnt, fill=rgb+(255,))
 
         # flatten background and text
@@ -298,13 +298,12 @@ class ElGateau(object):
         Parameters
         ----------
         keys : int, key number on device (1-15)
-            OR list (e.g., (1,4,12)) 
+            OR list (e.g., (1,4,12))
             OR 'all'
-        
+
         rc : boolean, Use the r,c (row,column) notation or not
             If rc=True, list of keys must be lists of tuples
             E.g., ((1,1),(1,4),(3,2))
-            
         """
         if keys == 'all':
             # key = list(range(1,16))
@@ -314,19 +313,19 @@ class ElGateau(object):
             self.display_clear(1)
             return
 
-        if rc == False:
+        if not rc:
             if isinstance(keys, int):
                 keys = (keys,)
             for k in keys:
                 self.display_icon(k, self.key_blank)
 
-        if rc == True:
+        elif rc:
             # if it's a tuple in (r,c) format
             if isinstance(keys[0], int):
                 keys = (keys,)
             for k in keys:
                 self.display_icon(k, self.key_blank)
-                
+
     ########################################
     #
     # Key button functions
@@ -336,14 +335,14 @@ class ElGateau(object):
     #
     ########################################
 
-    def button_getch(self,remap=True):
+    def button_getch(self, remap=True):
         """
         Detect button presses for the keys on the device.
 
         Parameters
         ----------
         remap : boolean, use the remapping or not
-        
+
         Returns
         ----------
         key : int, Key number on device (1-15)
@@ -353,7 +352,7 @@ class ElGateau(object):
         state = self.device.read(NUM_KEYS+1)
         key = np.where(np.array(state) == 1)
         key = int(key[0][1])
-        if remap == True:
+        if remap:
             key = self.key_remap(key)
         time_press = time.time()
 
@@ -365,12 +364,12 @@ class ElGateau(object):
         time_release = time.time()
 
         return (key, (time_press, time_release))
-    
+
     def button_empty(self, timeout=5):
         """
         Device buffers button presses, so can carry over to following getch.
         Need to empty the buffer.
-        
+
         Parameters
         ----------
         timeout : int, How many ms to wait for device. Optional.
@@ -408,16 +407,16 @@ class ElGateau(object):
 
         # listen
         # only accepts certain key responses
-        if rc == False:
+        if not rc:
             if isinstance(keys, int):
                 keys = (keys,)
             while button not in keys:
                 button, button_time = self.button_getch()
 
-        elif rc == True:
+        elif rc:
             # not implemented yet
-            1==1
-       
+            1 == 1
+
         # only output the button press time
         response_time = button_time[0]-time_start
 
