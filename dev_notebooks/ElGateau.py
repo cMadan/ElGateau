@@ -18,7 +18,7 @@ __author__ = "Christopher Madan"
 __copyright__ = "Copyright 2017, Christopher Madan"
 
 __license__ = "MIT"
-__version__ = "0.3.2"
+__version__ = "0.3.5"
 __maintainer__ = "Christopher Madan"
 __email__ = "christopher.madan@nottingham.ac.uk"
 __status__ = "Development"
@@ -70,7 +70,7 @@ class ElGateau(object):
         self.device.open(HID_VENDOR, HID_PRODUCT)
 
         # pre-generate a blank key for later functions
-        self.KEY_BLANK = self.icon_solid()
+        self.key_blank = self.icon_solid()
 
     def __enter__(self):
         return self
@@ -115,10 +115,10 @@ class ElGateau(object):
         key : int, key number on device (1-15)
         (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
         """
-        if type(key) == int:
+        if isinstance(key, int):
             # simple remap of left-right ordering
             key = (np.floor((key-1)/5))*5 + (5-(np.mod(key-1, 5)))
-        elif type(key) == tuple:
+        elif isinstance(key, tuple):
             # (r,c) notation
             key = (key[0]-1)*5 + key[1]
             key = self.key_remap(key)  # still need to re-map ordering
@@ -131,30 +131,6 @@ class ElGateau(object):
     # icon_solid, icon_prep, icon_text
     #
     ########################################
-
-    def hex2rgb(self, col):
-        """
-        Convert from hex color string to RGB tuple.
-
-        Parameters
-        ----------
-        col : Hex color string for background.
-
-        Returns
-        ----------
-        color : RGB tuple (0-255,0-255,0-255)
-        """
-        if type(col) == tuple:
-            # assume this is RGB in (0-1) format
-            # not an intended input, but we can work with it
-            rgb = np.array(col)*255
-            return rgb
-
-        # if preceded by a '#', remove it
-        col = col.replace('#', '')
-
-        rgb = tuple(bytes.fromhex(col))
-        return rgb
 
     def icon_solid(self, col='000000'):
         """
@@ -169,7 +145,7 @@ class ElGateau(object):
         ico : 72x72 RGBA image
         """
         # make blank image of a solid color
-        rgb = self.hex2rgb(col)
+        rgb = hex2rgb(col)
         ico = Image.new('RGBA', ICON_SIZE, rgb+(255,))
         return ico
 
@@ -203,8 +179,8 @@ class ElGateau(object):
         ico.thumbnail(ICON_SIZE)
         return ico
 
-    def icon_text(self, text, position=(31, 31), ico=None, col='ffffff',
-                  back='000000', font='VeraMono-Bold', size=14):
+    def icon_text(self, text, ico=None, col='ffffff', back='000000',
+                  font='VeraMono-Bold', size=14, position=(31, 31)):
         """
         Overlay text over icon.
 
@@ -223,6 +199,7 @@ class ElGateau(object):
             Optional, defaults to VeraMono-Bold.
         size : Font size.
             Optional, defaults to 14.
+        position : (int, int), Center of where to draw the text
 
         Returns
         ----------
@@ -232,7 +209,7 @@ class ElGateau(object):
         if back != '000000':
             ico = self.icon_solid(back)
         elif ico is None:
-            ico = self.KEY_BLANK
+            ico = self.key_blank
 
         # underlay
         base = ico
@@ -243,18 +220,23 @@ class ElGateau(object):
 
         # setup font
         fnt = ImageFont.truetype(os.path.join("fonts", font+".ttf"), size)
-        rgb = self.hex2rgb(col)
+        rgb = hex2rgb(col)
         # get a drawing context
         draw = ImageDraw.Draw(txt)
 
         # write text
+
         # even after the recent patch, text align doesn't seem to work
         # https://github.com/python-pillow/Pillow/pull/2641
         # no error in PIL 4.3.0,
         # but also doesn't seem to actually affect alignment
+
+        # manual fix for centering
         width, height = draw.textsize(text, font=fnt)
         position = (position[0]-width/2+4, position[1]-height/2)
-        # manual fix for centering
+        # convert location positions to int (rather than float)
+        position = tuple(map(int, position))
+        
         draw.text(position, text, font=fnt, fill=rgb+(255,))
 
         # flatten background and text
@@ -276,8 +258,8 @@ class ElGateau(object):
 
         Parameters
         ----------
-        key : int, key number on device (1-15)
-        OR key: tuple, key number in row,column notation (1-3,1-5)
+        key : int, Key number on device (1-15)
+        OR key: tuple, Key number in row,column notation (1-3,1-5)
         ico : 72x72 RGBA image
         """
         # icon gets written to display from right to left,
@@ -326,19 +308,18 @@ class ElGateau(object):
             self.display_clear(1)
             return
 
-        if type(key) == list:
+        if isinstance(key, list):
             for k in key:
-                self.display_icon(k, self.KEY_BLANK)
+                self.display_icon(k, self.key_blank)
         else:
             # if it's a tuple in (r,c) format, we want to respect that still
-            self.display_icon(key, self.KEY_BLANK)
+            self.display_icon(key, self.key_blank)
 
     ########################################
     #
     # Key button functions
     #
-    # button_getch
-    # rest not implemented yet
+    # button_getch, button_listen_key, button_listen_count
     #
     ########################################
 
@@ -348,8 +329,8 @@ class ElGateau(object):
 
         Returns
         ----------
-        key : int, key number on device (1-15)
-        time  : tuple, unix time of key [0] key press, and [1] key release
+        key : int, Key number on device (1-15)
+        time  : tuple, Unix time of key [0] button press and [1] button release
         """
         # wait for button press
         state = self.device.read(NUM_KEYS+1)
@@ -365,3 +346,91 @@ class ElGateau(object):
         time_release = time.time()
 
         return (key, (time_press, time_release))
+
+    def button_listen_key(self, keys):
+        """
+        Listen for specified key to be pressed.
+
+        Parameters
+        ----------
+        keys : int or list, Key(s) to listen for
+
+        Returns
+        ----------
+        button : int, Key detected
+        response_time : float, Time between listen initiated and button press
+        """
+        # get time for starting to listen
+        time_start = time.time()
+        # initiate button with 0, since no presses just yet
+        button = 0
+
+        # listen
+        # only accepts certain key responses
+        while button not in keys:
+            button, button_time = self.button_getch()
+        # only output the button press time
+        response_time = button_time[0]-time_start
+
+        return (button, response_time)
+
+    def button_listen_count(self, count):
+        """
+        Listen for specific number of button presses
+
+        Parameters
+        ----------
+        count : Number of key presses to listen for
+
+        Returns
+        ----------
+        key_list : list, keys pressed
+        rt_list : list, time between listen initiated and each press
+        """
+        # get time for starting to listen
+        time_start = time.time()
+        # define the counting variable
+        count_i = 0
+        # define the variable where we'll keep our list
+        key_list = []
+        rt_list = []
+
+        # listen
+        # stop after 'count' presses
+        while count_i < count:
+            button, button_time = self.button_getch()
+            key_list.append(button)
+            rt_list.append(button_time[0]-time_start)
+            count_i += 1
+
+        return (key_list, rt_list)
+
+#
+#
+
+# helper functions
+
+
+def hex2rgb(col):
+    """
+    Convert from hex color string to RGB tuple.
+
+    Parameters
+    ----------
+    col : Hex color string for background.
+
+    Returns
+    ----------
+    color : RGB tuple (0-255,0-255,0-255)
+    """
+    if isinstance(col, tuple):
+        # assume this is RGB in (0-1) format
+        # not an intended input, but we can work with it
+        rgb = tuple(np.array(col)*255)
+        return rgb
+
+    # if preceded by a '#', remove it
+    col = col.replace('#', '')
+
+    rgb = tuple(bytes.fromhex(col))
+    return rgb
