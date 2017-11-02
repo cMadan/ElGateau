@@ -29,7 +29,7 @@ The Elgato Stream Deck is effectively a USB interface device with an rray of 3x5
 		+ Create icons that are solid colors (`Icon.solid`)
 		+ Read in images, pad them, and resize them (`Icon.prep`)
 		+ Write text to an icon, including overlay on image and multi-line text, as well as specified font name/size/position (`Icon.text`)
-		+ Includes some generic `label' information (image/solid/text) that gets passed on to `ElGateau.display_status` as well as specific `contents` information such as icon filenames, hex color code for solid colors, or text strings
+		+ Includes some generic `label` information (image/solid/text) that gets passed on to `ElGateau.display_status` as well as specific `contents` information such as icon filenames, hex color code for solid colors, or text strings
 	* Remap the key numbering to be more intuitive (`ElGateau.key_remap`), can use either a 1-15 numbering, or a (row,column) notation (not fully implemented on display and button listen functions yet)
 	* Conversion of hex color strings (e.g., `E5E5E5`) to RGB tuples (`hex2rgb`)
 
