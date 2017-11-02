@@ -18,7 +18,7 @@ __author__ = "Christopher Madan"
 __copyright__ = "Copyright 2017, Christopher Madan"
 
 __license__ = "MIT"
-__version__ = "0.4.1"
+__version__ = "0.6.0"
 __maintainer__ = "Christopher Madan"
 __email__ = "christopher.madan@nottingham.ac.uk"
 __status__ = "Development"
@@ -69,8 +69,13 @@ class ElGateau(object):
         self.device = hid.device(HID_VENDOR, HID_PRODUCT)
         self.device.open(HID_VENDOR, HID_PRODUCT)
 
-        # pre-generate a blank key for later functions
-        self.key_blank = self.icon_solid()
+        # initiate internal representation
+        self.display_status = {}
+        self.display_status['label'] = {}
+        self.display_status['contents'] = {}
+        for k in range (1,NUM_KEYS+1):
+            self.display_status['label'][k] = 'blank'
+            self.display_status['contents'][k] = 'blank'
 
     def __enter__(self):
         return self
@@ -126,137 +131,26 @@ class ElGateau(object):
 
     ########################################
     #
-    # Icon generation functions
-    #
-    # icon_solid, icon_prep, icon_text
-    #
-    ########################################
-
-    def icon_solid(self, col='000000'):
-        """
-        Create a icon that is a solid color.
-
-        Parameters
-        ----------
-        col : Hex color string for background.
-
-        Returns
-        ----------
-        ico : 72x72 RGBA image
-        """
-        # make blank image of a solid color
-        rgb = hex2rgb(col)
-        ico = Image.new('RGBA', ICON_SIZE, rgb+(255,))
-        return ico
-
-    def icon_prep(self, icon, pad=0):
-        """
-        Prepare icon (read from file, pad, resize).
-
-        Parameters
-        ----------
-        icon : Filename for icon to prepare,
-               needs to be a PNG in the "icons" folder.
-        bright : px
-            Pad the icon before resizing, this way the icon
-            doesn't go right to edge of display.
-
-        Returns
-        ----------
-        ico : 72x72 RGBA image
-        """
-        # read icon
-        ico = Image.open(os.path.join("icons", icon+".png"))
-
-        # pad with blank space if don't know
-        padded_size = ico.size[0]+pad, ico.size[1]+pad
-        padded_im = Image.new("RGBA", padded_size)
-        padded_im.paste(ico, (int((padded_size[0]-ico.size[0])/2),
-                              int((padded_size[1]-ico.size[1])/2)))
-        ico = padded_im
-
-        # ensure final image is 72x72
-        ico.thumbnail(ICON_SIZE)
-        return ico
-
-    def icon_text(self, text, ico=None, col='ffffff', back='000000',
-                  font='VeraMono-Bold', size=14, position=(31, 31)):
-        """
-        Overlay text over icon.
-
-        Parameters
-        ----------
-        text : str
-            Text to write.
-        ico : 72x72 RGBA image
-            Should have been output from icon_prep or icon_solid.
-            Optional, defaults to black background.
-        col : Hex color code string for text.
-            Optional, defaults to white ('ffffff').
-        back : Hex color string for background.
-            Optional, defaults to black ('000000').
-        font : Font filename, should be in "fonts" folder.
-            Optional, defaults to VeraMono-Bold.
-        size : Font size.
-            Optional, defaults to 14.
-        position : (int, int), Center of where to draw the text
-
-        Returns
-        ----------
-        ico : 72x72 RGBA image
-        """
-        # make a solid color background if necessary
-        if back != '000000':
-            ico = self.icon_solid(back)
-        elif ico is None:
-            ico = self.key_blank
-
-        # underlay
-        base = ico
-
-        # make a blank image for the text,
-        # initialized to transparent text color
-        txt = Image.new('RGBA', base.size, (255, 255, 255, 0))
-
-        # setup font
-        fnt = ImageFont.truetype(os.path.join("fonts", font+".ttf"), size)
-        rgb = hex2rgb(col)
-        # get a drawing context
-        draw = ImageDraw.Draw(txt)
-
-        # write text
-        width, height = draw.textsize(text, font=fnt)
-        position = (position[0]-width/2+4, position[1]-height/2+4)
-        # convert location positions to int (rather than float)
-        position = tuple(map(int, position))
-
-        draw.text(position, text, font=fnt, fill=rgb+(255,), align='center')
-
-        # flatten background and text
-        ico = Image.alpha_composite(base, txt)
-
-        return ico
-
-    ########################################
-    #
     # Key display functions
     #
     # display_icon, display_clear
     #
     ########################################
 
-    def display_icon(self, key, ico):
+    def display_icon(self, key, icon, remap=True):
         """
         Push an icon to a key display on the device.
+        (Does not update internal display_status, use display_update instead.)
 
         Parameters
         ----------
         key : int, Key number on device (1-15)
         OR key: tuple, Key number in row,column notation (1-3,1-5)
-        ico : 72x72 RGBA image
+        icon : Icon object (from Icon class)
         """
         # icon gets written to display from right to left,
         # so need to mirror it before sending so it looks correct
+        ico = icon['icon']
         ico = ico.transpose(Image.FLIP_LEFT_RIGHT)
 
         # buffer pixel data into a list and shuffle colors to BGR
@@ -268,8 +162,9 @@ class ElGateau(object):
             b = icobuffer[pixel][2]
             pixels = np.concatenate([pixels, np.array([b, g, r])])
 
-        # remap the key locations to make more sense
-        key = self.key_remap(key)
+        if remap:
+            # remap the key locations to make more sense
+            key = self.key_remap(key)
 
         # send pixel data to elg
         header = HEADER_PAGE1
@@ -318,7 +213,29 @@ class ElGateau(object):
                 keys = (keys,)
             for k in keys:
                 self.display_icon(k, self.key_blank)
+                
+    def display_update(self,key,icon):
+        """
+        Updates device key displays as well as 
+        internal representation of device key displays.
 
+        Parameters
+        ----------
+        key : int, Key number on device (1-15)
+        OR key: tuple, Key number in row,column notation (1-3,1-5)
+        icon : Icon object (from Icon class)
+        """
+        # update internal representation
+        self.display_status['label'][key] = icon['label']
+        self.display_status['contents'][key] = icon['contents']
+        
+        # remap the key locations to make more sense
+        key = self.key_remap(key)
+        
+        # push to device
+        self.display_icon(key, icon, remap=False)  # already remapped!
+
+        
     ########################################
     #
     # Key button functions
@@ -328,13 +245,14 @@ class ElGateau(object):
     #
     ########################################
 
-    def button_getch(self, remap=True):
+    def button_getch(self, remap=True, timeout=0):
         """
         Detect button presses for the keys on the device.
 
         Parameters
         ----------
         remap : boolean, use the remapping or not
+        timeout : int, How many ms to wait for device. Optional.
 
         Returns
         ----------
@@ -451,9 +369,6 @@ class ElGateau(object):
 #
 #
 
-# helper functions
-
-
 def hex2rgb(col):
     """
     Convert from hex color string to RGB tuple.
@@ -477,3 +392,144 @@ def hex2rgb(col):
 
     rgb = tuple(bytes.fromhex(col))
     return rgb
+
+#
+#
+
+class Icon(object):
+    """
+    Object for preparing icons for ElGateau.
+    """
+    
+    ########################################
+    #
+    # Icon generation functions
+    #
+    # hex2rgb, solid, prep, text
+    #
+    ########################################
+    
+    def solid(col='000000'):
+        """
+        Create a icon that is a solid color.
+
+        Parameters
+        ----------
+        col : Hex color string for background.
+
+        Returns
+        ----------
+        icon : Icon object (from Icon class)
+        """
+        # make blank image of a solid color
+        rgb = hex2rgb(col)
+        ico = Image.new('RGBA', ICON_SIZE, rgb+(255,))
+
+        icon = {}
+        icon['icon'] = ico
+        icon['label'] = 'solid'
+        icon['contents'] = col
+        return icon
+
+    def prep(filename, pad=0):
+        """
+        Prepare icon (read from file, pad, resize).
+
+        Parameters
+        ----------
+        filename : Filename for icon to prepare,
+                   needs to be a PNG in the "icons" folder.
+        bright : px
+            Pad the icon before resizing, this way the icon
+            doesn't go right to edge of display.
+
+        Returns
+        ----------
+        icon : Icon object (from Icon class)
+        """
+        # read icon
+        ico = Image.open(os.path.join("icons", filename+".png"))
+
+        # pad with blank space if don't know
+        padded_size = ico.size[0]+pad, ico.size[1]+pad
+        padded_im = Image.new("RGBA", padded_size)
+        padded_im.paste(ico, (int((padded_size[0]-ico.size[0])/2),
+                              int((padded_size[1]-ico.size[1])/2)))
+        ico = padded_im
+
+        # ensure final image is 72x72
+        ico.thumbnail(ICON_SIZE)
+
+        icon = {}
+        icon['icon'] = ico
+        icon['label'] = 'image'
+        icon['contents'] = filename
+        return icon
+
+    def text(text, ico=None, col='ffffff', back='000000',
+                  font='VeraMono-Bold', size=14, position=(31, 31)):
+        """
+        Overlay text over icon.
+
+        Parameters
+        ----------
+        text : str
+            Text to write.
+        ico : 72x72 RGBA image
+            Should have been output from icon_prep or icon_solid.
+            Optional, defaults to black background.
+        col : Hex color code string for text.
+            Optional, defaults to white ('ffffff').
+        back : Hex color string for background.
+            Optional, defaults to black ('000000').
+        font : Font filename, should be in "fonts" folder.
+            Optional, defaults to VeraMono-Bold.
+        size : Font size.
+            Optional, defaults to 14.
+        position : (int, int), Center of where to draw the text
+
+        Returns
+        ----------
+        icon : Icon object (from Icon class)
+        """
+        # make a solid color background if necessary
+        if back != '000000':
+            ico = Icon.solid(back)
+        elif ico is None:
+            ico = Icon.key_blank
+
+        # underlay
+        base = ico['icon']
+
+        # make a blank image for the text,
+        # initialized to transparent text color
+        txt = Image.new('RGBA', base.size, (255, 255, 255, 0))
+
+        # setup font
+        fnt = ImageFont.truetype(os.path.join("fonts", font+".ttf"), size)
+        rgb = hex2rgb(col)
+        # get a drawing context
+        draw = ImageDraw.Draw(txt)
+
+        # write text
+        width, height = draw.textsize(text, font=fnt)
+        position = (position[0]-width/2+4, position[1]-height/2+4)
+        # convert location positions to int (rather than float)
+        position = tuple(map(int, position))
+
+        draw.text(position, text, font=fnt, fill=rgb+(255,), align='center')
+
+        # flatten background and text
+        ico = Image.alpha_composite(base, txt)
+
+        icon = {}
+        icon['icon'] = ico
+        icon['label'] = 'text'
+        icon['contents'] = text
+        return icon
+
+    # pre-generate a blank key for later functions
+    key_blank = solid()
+    key_blank['label'] = '_'
+    key_blank['contents'] = '_'
+
