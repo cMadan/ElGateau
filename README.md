@@ -8,132 +8,41 @@ The Elgato Stream Deck is effectively a USB interface device with an rray of 3x5
 
 ![Elgato Stream Deck](https://cdn.vox-cdn.com/uploads/chorus_image/image/54298497/91fukDTbNVL._SL1500_.0.jpg)
 
-## To do list
 
-1. Build a basic API
-	- DONE
-		- ~~Reset screen~~
-		- ~~Update icons~~
-			+ ~~Separate icon 'preprocessing' (load/padding/resizing) from 'push to display'~~
-			+ ~~Function to re-map key number to something more sensible~~
-				- ~~Allow for (row,column) notation too, also gets re-mapped~~
-			+ ~~Write text to an icon~~
-				* ~~If ico=None, make it work with black background~~
-				* ~~Have text location as parameter~~ 
-				* ~~Really no fix for centering text...??~~
-					+ https://github.com/python-pillow/Pillow/issues/2067
-			+ ~~'clear key' that is an alias for fill with solid color of black~~
-				- ~~ICON_BLANK as a constant, use in the ico=None case too~~
-				- ~~Add option to clear several keys at once~~
-				- ~~Add an 'all' option to clear all keys~~
-			- ~~Fix Page 2 header code, should be longer, then can fix start number for pixels being sent~~
-				+ ~~Change page info, reset, etc, from hex to dec~~
-		- Secondary functions
-			+ ~~Modify brightness~~
-		- ~~Package code into a Python module~~
-			+ ~~Rename 'inputs' to parameters~~
-			+ ~~Add some additional structure/comments to the module to make it more interpretable~~
-		- ~~Detect button presses~~
-			+ ~~Listen for *next* press~~
-				* ~~Remove the start time in getch~~
-			+ ~~Listen until specific key pressed (button_listen_specific(key))~~
-			+ ~~Listen until x key presses have been made (button_listen_count(n))~~
-			+ ~~Record key press sequences and RT~~
+## Current Functionality
 
-	- IN PROGRESS
-		- Standard word use: Keys consist of Button and Display. Icons and Text can be written to Displays.
-			- Update naming for icon vs display
+- Basic device interaction
+	* Open a USB I/O connection to the Stream Deck device (`ElGateau()`)
+	* Reset the LCD displays (`ElGateau.reset`) and set their brightness (`ElGateau.set_brightness`)
 
-		- Look into fonts more
-			- https://github.com/source-foundry/Hack
-			- https://github.com/jslegers/emoji-icon-font
-			- https://github.com/koemaeda/gohufont-ttf
-			- https://github.com/ranesr/SwiftIcons
-			- https://github.com/chrissimpkins/codeface
-			- https://github.com/Tecate/bitmap-fonts
-			- https://github.com/romeovs/creep
-			- https://github.com/MicahElliott/Orp-Font
+- Update the displays of the LCD keys (`ElGateau.display_update`)
+	* This function additionally updates an internal representation of the displays (`ElGateau.display_status`)
+	* Wraps around 'low-level' interaction with the device (`ElGateau.display_icon`)
+	* Easy clearing of a specified key display (or multiple) (`ElGateau.display_clear`)
 
-		- Build some basic data logging functions
-			+ Maybe this should be a nested class?
-			+ Open log file, parse subject ID with sys.argv
-				- only if None input, else use provided subject ID
-			+ Log all responses to a given trial (and RT), based on key listener primitive
-			+ Ability to push custom logs (e.g., for memory task, log initial positions, location of each icon name)
-				* timestamp, trial number, log record type ([D]isplay,[B]utton,[C]ustom)
-				* log startof button listeners and their end conditions?
-			+ Close log file
-				* Will require a log file handle to be stored
+- Listen for key button presses (`ElGateau.button_listen`) [NOT IMPLEMENTED YET]
+	* This function wraps around 'low-level' interaction with the device (`ElGateau.button_getch`)
+	* Also 'high-level' button listening for either specifed key(s) to be pressed (`ElGateau.button_listen_key`) or a number of key presses (`ElGateau.button_listen_count`)
 
-		- Make a boot function (open, reset, draw {cake, 'ElGateau','cMadan',version}, some screen test, clear displays)
+- Additional convenience functions:
+	* An `Icon` class that helps with preparation of the icons to be displayed on the keys
+		+ Create icons that are solid colors (`Icon.solid`)
+		+ Read in images, pad them, and resize them (`Icon.prep`)
+		+ Write text to an icon, including overlay on image and multi-line text, as well as specified font name/size/position (`Icon.text`)
+		+ Includes some generic `label' information (image/solid/text) that gets passed on to `ElGateau.display_status` as well as specific `contents` information such as icon filenames, hex color code for solid colors, or text strings
+	* Remap the key numbering to be more intuitive (`ElGateau.key_remap`), can use either a 1-15 numbering, or a (row,column) notation (not fully implemented on display and button listen functions yet)
+	* Conversion of hex color strings (e.g., `E5E5E5`) to RGB tuples (`hex2rgb`)
 
-		- Create an internal variable that maintains information about what is being displayed on the buttons, at the very least generic ('icon', 'text', 'blank') but could also be user-specified information ('cake','points')
-			+ Would need to be added into the ico variable, maybe should make ico into it's own class?
 
-1. Reorganize useful links from above (other APIs, fonts) into a useful list
+## Coming Soon
 
-1. Make simple proof-of-principle 'experiments'
+- Basic demo experiments
 
-	- Demo script
-		+ Fill each key with an icon, spiral pattern
-		+ Write key number on each, pixel text
-		+ Key monitor waits for any key press
-			* Check that key is released
+- Developer mode, that doesn't require the device to be connected, with I/O through Jupyter notebook
 
-	- Visual search
-		+ Record False alarms and RT (per trial)
-		+ Presents 15 different icons, find the target one, press
+- Logging (in-line with experimental psychology needs)
 
-	- Match color
-		+ ~~Prints color "red", "green", "blue" to command window, have to press designated button~~
-		+ ~~Shuffle R/G/B buttons across trials~~
-		+ Make colors flicker to make it a bit more engaging
-		+ Change how shuffling works, show color label before flickering happens
-			* Set 'flickering' to occur a random amount within a range
-		+ Add extra colors? (pink, purple, orange, yellow, brown) -- not sure...
-			* Use Brewer colors?
-
-	- Devil task (look at paper again)
-		+ Use emoji font
-			* http://jslegers.github.io/emoji-icon-font/
-			* definitely: 1f608 or 1f47f (devil) or 1f4a3 (bomb), 1f4b5 (money in box), 1f4b0 (money total) 
-			* maybe: 229e (+ box), 1f3e6 (bank) 
-			* bank icon, trial number, amount saved (from previous trials) -- top row
-		+ https://stackoverflow.com/questions/11411746/drawing-multilingual-text-using-pil
-		
-		+ Brassen et al. (2012)
-			* "On each trial, an array of eight boxes was presented, where seven boxes con- tained a gain (“gold”) and one contained a loss (“devil”)."
-				- Will do 10 here
-			* "Boxes could be opened from left to right. At any stage, volunteers could either open the next box or stop and collect the gains ac- quired so far in this round. Exposing the random- ly distributed devil ended the trial, and all gains from this round were lost."
-			* "If volunteers decided to stop and collect their gains, the position of the devil was revealed, indicating how far they could have safely continued (“missed chance”)." 
-
-	- Memory game
-		+ Card flips, 7 pairs, etc.
-
-	- Go/nogo?
-
-	- Config, get subject number with sys.argv
-
-1. Make a windowed 'developer-mode' that doesn't require hardware??
-http://pygame.org/project/3267/5313
-
-1. Write up basic docs
-	- badges from shields.io
-		+ Python 3
-
-1. Write as short paper for JOSS? If not, maybe F1000Research?
-
-## Existing APIs
-- https://github.com/Lange/node-elgato-stream-deck
-- https://github.com/danieltian/stream-deck-api
-
-- https://github.com/OpenStreamDeck/StreamDeckSharp
-
-- https://github.com/Number10Ox/stream-deck-driver
-- https://github.com/GalacticGlum/StreamDeck
-- https://github.com/WElRD/StreamDeckCore
-- https://github.com/sammessina/csharp-elgato-stream-deck
-- https://github.com/tchiak/NET-elgato-stream-deck
+For current (unpolished) notes on the status of the project, see [Notes.md](Notes.md)
 
 
 ## Dependencies
@@ -141,11 +50,13 @@ pip install ...
 - hidapi [https://github.com/trezor/cython-hidapi/blob/master/hid.pyx]
 - Pillow [http://pillow.readthedocs.io/en/latest/index.html]
 
+
 ### Disclaimer
 
 This project is not associated with Elgato Systems GmbH. 
 Emoji artwork is provided by EmojiOne (v2.3) and is licensed under CC-BY 4.0.
 (pixel font?)
+
 
 ### Acknowledgements
 
