@@ -1,64 +1,38 @@
 ## To do list
 
 1. Build a basic API
-	- DONE
-		- ~~Reset screen~~
-		- ~~Update icons~~
-			+ ~~Separate icon 'preprocessing' (load/padding/resizing) from 'push to display'~~
-			+ ~~Function to re-map key number to something more sensible~~
-				- ~~Allow for (row,column) notation too, also gets re-mapped~~
-			+ ~~Write text to an icon~~
-				* ~~If ico=None, make it work with black background~~
-				* ~~Have text location as parameter~~ 
-				* ~~Really no fix for centering text...??~~
-					+ https://github.com/python-pillow/Pillow/issues/2067
-			+ ~~'clear key' that is an alias for fill with solid color of black~~
-				- ~~ICON_BLANK as a constant, use in the ico=None case too~~
-				- ~~Add option to clear several keys at once~~
-				- ~~Add an 'all' option to clear all keys~~
-			- ~~Fix Page 2 header code, should be longer, then can fix start number for pixels being sent~~
-				+ ~~Change page info, reset, etc, from hex to dec~~
-		- Secondary functions
-			+ ~~Modify brightness~~
-		- ~~Package code into a Python module~~
-			+ ~~Rename 'inputs' to parameters~~
-			+ ~~Add some additional structure/comments to the module to make it more interpretable~~
-		- ~~Detect button presses~~
-			+ ~~Listen for *next* press~~
-				* ~~Remove the start time in getch~~
-			+ ~~Listen until specific key pressed (button_listen_specific(key))~~
-			+ ~~Listen until x key presses have been made (button_listen_count(n))~~
-			+ ~~Record key press sequences and RT~~
 
-		- ~~Create an internal variable that maintains information about what is being displayed on the buttons, at the very least generic ('icon', 'text', 'blank') but could also be user-specified information ('cake','points')~~
-			+ ~~Would need to be added into the ico variable, maybe should make ico into it's own class?~~
+	- Standard word use: Keys consist of Button and Display. Icons and Text can be written to Displays.
+		- Update naming for icon vs display
 
-	- IN PROGRESS
-		- Standard word use: Keys consist of Button and Display. Icons and Text can be written to Displays.
-			- Update naming for icon vs display
+	- Look into fonts more
+		- https://github.com/source-foundry/Hack
+		- https://github.com/jslegers/emoji-icon-font
+		- https://github.com/koemaeda/gohufont-ttf
+		- https://github.com/ranesr/SwiftIcons
+		- https://github.com/chrissimpkins/codeface
+		- https://github.com/Tecate/bitmap-fonts
+		- https://github.com/romeovs/creep
+		- https://github.com/MicahElliott/Orp-Font
 
-		- Look into fonts more
-			- https://github.com/source-foundry/Hack
-			- https://github.com/jslegers/emoji-icon-font
-			- https://github.com/koemaeda/gohufont-ttf
-			- https://github.com/ranesr/SwiftIcons
-			- https://github.com/chrissimpkins/codeface
-			- https://github.com/Tecate/bitmap-fonts
-			- https://github.com/romeovs/creep
-			- https://github.com/MicahElliott/Orp-Font
+	- Build some basic data logging functions
+		+ Maybe this should be a nested class?
+		+ Open log file, parse subject ID with sys.argv
+			- only if None input, else use provided subject ID
+		+ Log all responses to a given trial (and RT), based on key listener primitive
+		+ Ability to push custom logs (e.g., for memory task, log initial positions, location of each icon name)
+			* timestamp, trial number, log record type ([D]isplay,[B]utton,[C]ustom)
+			* log startof button listeners and their end conditions?
+		+ Close log file
+			* Will require a log file handle to be stored
 
-		- Build some basic data logging functions
-			+ Maybe this should be a nested class?
-			+ Open log file, parse subject ID with sys.argv
-				- only if None input, else use provided subject ID
-			+ Log all responses to a given trial (and RT), based on key listener primitive
-			+ Ability to push custom logs (e.g., for memory task, log initial positions, location of each icon name)
-				* timestamp, trial number, log record type ([D]isplay,[B]utton,[C]ustom)
-				* log startof button listeners and their end conditions?
-			+ Close log file
-				* Will require a log file handle to be stored
+	- Make a boot function (open, reset, draw {cake, 'ElGateau','cMadan',version}, some screen test, clear displays)
 
-		- Make a boot function (open, reset, draw {cake, 'ElGateau','cMadan',version}, some screen test, clear displays)
+1. Work on 'developer mode'
+	- Display works, now work on button presses
+		+ Best option is an interactive figure in Jupyter with mpl?
+			+ Can I do imports based on if-statement and still be good with PEP8 ?
+
 
 1. Reorganize useful links from above (other APIs, fonts) into a useful list
 
@@ -100,12 +74,7 @@
 	- Memory game
 		+ Card flips, 7 pairs, etc.
 
-	- Go/nogo?
-
-	- Config, get subject number with sys.argv
-
-1. Make a windowed 'developer-mode' that doesn't require hardware??
-http://pygame.org/project/3267/5313
+	- Config, get subject number with sys.argv, else can be passed in init call?
 
 1. Write up basic docs
 	- badges from shields.io

@@ -21,6 +21,9 @@ The Elgato Stream Deck is effectively a USB interface device with an rray of 3x5
 	* This function additionally updates an internal representation of the displays (`ElGateau.display_status`)
 	* Wraps around 'low-level' interaction with the device (`ElGateau.display_icon`)
 	* Easy clearing of a specified key display (or multiple) (`ElGateau.display_clear`)
+	* When in developer mode (`dev_mode`), display info is instead passed to an display updating function (`ElGateau.dev_display_icon`), which updates an image representing the Stream Deck, rather than the actual device
+		+ This 'virtual display' can be accessed at any time as `ElGateau.display_state`
+			- This virtual display is only maintained if in developer mode, as it otherwise is unneeded and would slow interactions with the Stream Deck device
 
 - Listen for key button presses (`ElGateau.button_listen`) [NOT IMPLEMENTED YET]
 	* This function wraps around 'low-level' interaction with the device (`ElGateau.button_getch`)
