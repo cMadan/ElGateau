@@ -28,6 +28,7 @@ HID_VENDOR = 4057
 HID_PRODUCT = 96
 
 NUM_KEYS = 15
+NUM_KEYS_ROW = 5
 ICON_SIZE = 72, 72
 
 NUM_TOTAL_PIXELS = ICON_SIZE[0]*ICON_SIZE[1]
@@ -73,9 +74,10 @@ class ElGateau(object):
         self.display_status = {}
         self.display_status['label'] = {}
         self.display_status['contents'] = {}
-        for k in range (1,NUM_KEYS+1):
+        for k in range(1, NUM_KEYS+1):
             self.display_status['label'][k] = 'blank'
             self.display_status['contents'][k] = 'blank'
+            self.display_status['ico'][k] = 'blank'
 
     def __enter__(self):
         return self
@@ -122,10 +124,11 @@ class ElGateau(object):
         """
         if isinstance(key, int):
             # simple remap of left-right ordering
-            key = (np.floor((key-1)/5))*5 + (5-(np.mod(key-1, 5)))
+            key = (np.floor((key-1)/NUM_KEYS_ROW))*NUM_KEYS_ROW + \
+                    (NUM_KEYS_ROW-(np.mod(key-1, NUM_KEYS_ROW)))
         elif isinstance(key, tuple):
             # (r,c) notation
-            key = (key[0]-1)*5 + key[1]
+            key = (key[0]-1)*NUM_KEYS_ROW + key[1]
             key = self.key_remap(key)  # still need to re-map ordering
         return int(key)
 
@@ -213,10 +216,10 @@ class ElGateau(object):
                 keys = (keys,)
             for k in keys:
                 self.display_icon(k, self.key_blank)
-                
-    def display_update(self,key,icon):
+
+    def display_update(self, key, icon):
         """
-        Updates device key displays as well as 
+        Updates device key displays as well as
         internal representation of device key displays.
 
         Parameters
@@ -228,14 +231,14 @@ class ElGateau(object):
         # update internal representation
         self.display_status['label'][key] = icon['label']
         self.display_status['contents'][key] = icon['contents']
-        
+        self.display_status['ico'][key] = icon['ico']
+
         # remap the key locations to make more sense
         key = self.key_remap(key)
-        
+
         # push to device
         self.display_icon(key, icon, remap=False)  # already remapped!
 
-        
     ########################################
     #
     # Key button functions
@@ -369,6 +372,7 @@ class ElGateau(object):
 #
 #
 
+
 def hex2rgb(col):
     """
     Convert from hex color string to RGB tuple.
@@ -396,11 +400,12 @@ def hex2rgb(col):
 #
 #
 
+
 class Icon(object):
     """
     Object for preparing icons for ElGateau.
     """
-    
+
     ########################################
     #
     # Icon generation functions
@@ -408,7 +413,7 @@ class Icon(object):
     # hex2rgb, solid, prep, text
     #
     ########################################
-    
+
     def solid(col='000000'):
         """
         Create a icon that is a solid color.
@@ -467,7 +472,7 @@ class Icon(object):
         return icon
 
     def text(text, ico=None, col='ffffff', back='000000',
-                  font='VeraMono-Bold', size=14, position=(31, 31)):
+             font='VeraMono-Bold', size=14, position=(31, 31)):
         """
         Overlay text over icon.
 
@@ -532,4 +537,3 @@ class Icon(object):
     key_blank = solid()
     key_blank['label'] = '_'
     key_blank['contents'] = '_'
-
