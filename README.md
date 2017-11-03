@@ -4,7 +4,9 @@ ElGateau: A Framework for Using the Elgato Stream Deck for Experimental Psycholo
 Tested in Windows 10.
 (Later will test in Mac OS X 10.11.)
 
-The Elgato Stream Deck is effectively a USB interface device with an rray of 3x5 keys. Each key has an LCD display (72x72 px resolution) on the face of it, and has physical buttons that can be pressed and released. This project is a Python API for this device (updating displays, listen for button presses), along with supporting functionality (e.g., writing text to the display, 'preprocessing' images before writing to display, monitoring for specific button presses). On top of this base functionality, the 'framework' also includes higher-level functions to support using this device in experimental psychology research, such as logging display updates and key presses as well as storing internal representations of the current displays on the device.
+In experimental psychology research, we often ask participants to press specific keys to correspond to responses in the experiment. For instance, one key for 'old' and another for 'new' in and old/new recognition memory test, 'word' and 'nonword' in a lexical decision task, or even red/green/blue in a Stroop test. Sometimes we put stickers over keys on a keyboard to remind participants of these key mappings, but other times they are just included as part of the experiment instructions. What if we could easily just write 'old' and 'new' on the keys themselves? This can lead to better counterbalancing across participants, but we could even counterbalance key mappings across trials if we wanted. In some cases, we could implement a whole experiment on an LCD keypad. This project is the infrastructure for implementing experiments using an LCD keypad called the Elgato Stream Deck.
+
+The Elgato Stream Deck is effectively a USB interface device with an rray of 3x5 keys. Each key has an LCD display (72x72 px resolution) on the face of it, and has physical buttons that can be pressed and released. This project, 'ElGateau' is a Python API for using the Stream Deck device (updating displays, listen for button presses), along with supporting functionality (e.g., writing text to the display, 'preprocessing' images before writing to display, monitoring for specific button presses). On top of this base functionality, the ElGateau also includes higher-level functions to support using this device in experimental psychology research, such as logging display updates and key presses as well as storing internal representations of the current displays on the device. A 'developer mode' is also included to allow for experiment development without needing the Stream Deck device on hand.
 
 ![Elgato Stream Deck](https://cdn.vox-cdn.com/uploads/chorus_image/image/54298497/91fukDTbNVL._SL1500_.0.jpg)
 
@@ -55,7 +57,7 @@ pip install ...
 
 This project is not associated with Elgato Systems GmbH. 
 Emoji artwork is provided by EmojiOne (v2.3) and is licensed under CC-BY 4.0.
-(pixel font?)
+(pixel fonts?)
 
 
 ### Acknowledgements
