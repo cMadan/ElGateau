@@ -1,8 +1,5 @@
 # ElGateau
-ElGateau: A Framework for Using the Elgato Stream Deck for Experimental Psychology Research
-
-Tested in Windows 10.
-(Later will test in Mac OS X 10.11.)
+#### ElGateau: A Framework for Using the Elgato Stream Deck for Experimental Psychology Research
 
 In experimental psychology research, we often ask participants to press specific keys to correspond to responses in the experiment. For instance, one key for 'old' and another for 'new' in an old/new recognition memory test, 'word' and 'nonword' in a lexical decision task, or red/green/blue in a Stroop test. Sometimes we put stickers over keys on a keyboard to remind participants of these key mappings, but often they are merely included as part of the experiment instructions. What if we could easily just write 'old' and 'new' on the keys themselves? This approach could additionally lead to more manageable (and automatically logged) counterbalancing across participants, but we could further counterbalance key mappings across trials (or blocks of trials) if desired. In some cases, a whole experiment could be implemented on an LCD keypad. This project is the infrastructure for implementing experiments with an LCD keypad called the Elgato Stream Deck.
 
@@ -10,8 +7,10 @@ The Elgato Stream Deck is effectively a USB interface device with an rray of 3x5
 
 ![Elgato Stream Deck](https://cdn.vox-cdn.com/uploads/chorus_image/image/54298497/91fukDTbNVL._SL1500_.0.jpg)
 
+### Current Functionality
 
-## Current Functionality
+Tested in Windows 10.
+(Later will test in Mac OS X 10.11.)
 
 - Basic device interaction
 	* Open a USB I/O connection to the Stream Deck device (`ElGateau()`)
@@ -39,9 +38,11 @@ The Elgato Stream Deck is effectively a USB interface device with an rray of 3x5
 	* Conversion of hex color strings (e.g., `E5E5E5`) to RGB tuples (`hex2rgb`)
 
 
-## Coming Soon
+### Coming Soon
 
-- Basic demo experiments
+- Demo experiments
+
+- Jupyter notebooks with test code
 
 - Developer mode, that doesn't require the device to be connected, with I/O through Jupyter notebook
 
@@ -50,7 +51,7 @@ The Elgato Stream Deck is effectively a USB interface device with an rray of 3x5
 For current (unpolished) notes on the status of the project, see [Notes.md](Notes.md)
 
 
-## Dependencies
+### Dependencies
 pip install ...
 - hidapi [https://github.com/trezor/cython-hidapi/blob/master/hid.pyx]
 - Pillow [http://pillow.readthedocs.io/en/latest/index.html]
