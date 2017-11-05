@@ -54,7 +54,9 @@ For current (unpolished) notes on the status of the project, see [Notes.md](Note
 ### Dependencies
 pip install ...
 - hidapi [https://github.com/trezor/cython-hidapi/blob/master/hid.pyx]
+	+ Needs to be hidapi *not* hid!
 - Pillow [http://pillow.readthedocs.io/en/latest/index.html]
+	+ This is a Python 3 compatible fork of PIL
 
 
 ### Disclaimer
