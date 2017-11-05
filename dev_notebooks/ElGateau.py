@@ -18,7 +18,7 @@ __author__ = "Christopher Madan"
 __copyright__ = "Copyright 2017, Christopher Madan"
 
 __license__ = "MIT"
-__version__ = "0.6.3"
+__version__ = "0.6.4"
 __maintainer__ = "Christopher Madan"
 __email__ = "christopher.madan@nottingham.ac.uk"
 __status__ = "Development"
@@ -233,10 +233,13 @@ class ElGateau(object):
 
     def __init__(self, dev_mode=False):
         """
-        Open initial connection to Elgato Stream Deck device.
+        Open initial connection to Elgato Stream Deck device
+        and sets up initial variables.
         """
-        self.device = hid.device(HID_VENDOR, HID_PRODUCT)
-        self.device.open(HID_VENDOR, HID_PRODUCT)
+        if not dev_mode:
+            # only try to connect to device if not in developer mode!
+            self.device = hid.device(HID_VENDOR, HID_PRODUCT)
+            self.device.open(HID_VENDOR, HID_PRODUCT)
 
         # preload the blank key
         self.key_blank = Icon().key_blank
@@ -533,7 +536,7 @@ class ElGateau(object):
 
         elif rc:
             # not implemented yet
-            1 == 1
+            print('Not implemented yet')
 
         # only output the button press time
         response_time = button_time[0]-time_start
