@@ -236,11 +236,6 @@ class ElGateau(object):
         Open initial connection to Elgato Stream Deck device
         and sets up initial variables.
         """
-        if not dev_mode:
-            # only try to connect to device if not in developer mode!
-            self.device = hid.device(HID_VENDOR, HID_PRODUCT)
-            self.device.open(HID_VENDOR, HID_PRODUCT)
-
         # preload the blank key
         self.key_blank = Icon().key_blank
 
@@ -263,6 +258,15 @@ class ElGateau(object):
             self.dev_display_init()
         elif not self.dev_mode:
             self.display_state = 'display_state is only maintained if in developer mode'
+
+        # only try to connect to device if not in developer mode!
+        if not dev_mode:
+            self.device = hid.device(HID_VENDOR, HID_PRODUCT)
+            self.device.open(HID_VENDOR, HID_PRODUCT)
+            # send a reset command, 
+            # otherwise display may have icons from a previous instance
+            self.reset()
+
 
     def __enter__(self):
         return self
@@ -389,15 +393,14 @@ class ElGateau(object):
         """
         if keys == 'all':
             if not self.dev_mode:
+                # list(range) works, but is slow
+                # let's be more responsive
                 self.reset()
                 self.display_clear(1)
                 return
             elif self.dev_mode:
-                key = list(range(1,16))
-            # list(range) works, but is slow
-            # let's be more responsive
-            #
-            # if not in dev_mode, reset is faster than looping through keys
+                keys = list(range(1,16))
+                # if not in dev_mode, reset is faster than looping through keys
 
         if not rc:
             if isinstance(keys, int):
