@@ -18,7 +18,7 @@ __author__ = "Christopher Madan"
 __copyright__ = "Copyright 2017, Christopher Madan"
 
 __license__ = "MIT"
-__version__ = "0.6.1"
+__version__ = "0.6.3"
 __maintainer__ = "Christopher Madan"
 __email__ = "christopher.madan@nottingham.ac.uk"
 __status__ = "Development"
@@ -258,6 +258,8 @@ class ElGateau(object):
         self.dev_mode = dev_mode
         if self.dev_mode:
             self.dev_display_init()
+        elif not self.dev_mode:
+            self.display_state = 'display_state is only maintained if in developer mode'
 
     def __enter__(self):
         return self
@@ -274,6 +276,8 @@ class ElGateau(object):
         """
         if not self.dev_mode:
             self.device.send_feature_report(RESET_DATA)
+        elif self.dev_mode:
+            self.display_clear('all')
 
     def set_brightness(self, bright):
         """
@@ -324,8 +328,10 @@ class ElGateau(object):
 
     def display_icon(self, key, icon, remap=True):
         """
-        Push an icon to a key display on the device.
-        (Does not update internal display_status, use display_update instead.)
+        Low-level function not intended to be called directly.
+        (Does not update display_status, use display_update instead.)
+
+        Pushes an icon to a key display on the device.
 
         Parameters
         ----------
@@ -379,12 +385,16 @@ class ElGateau(object):
             E.g., ((1,1),(1,4),(3,2))
         """
         if keys == 'all':
-            # key = list(range(1,16))
+            if not self.dev_mode:
+                self.reset()
+                self.display_clear(1)
+                return
+            elif self.dev_mode:
+                key = list(range(1,16))
             # list(range) works, but is slow
             # let's be more responsive
-            self.reset()
-            self.display_clear(1)
-            return
+            #
+            # if not in dev_mode, reset is faster than looping through keys
 
         if not rc:
             if isinstance(keys, int):
@@ -402,9 +412,9 @@ class ElGateau(object):
     def display_update(self, key, icon):
         """
         Updates device key displays as well as
-        internal representation of device key displays.
+        internal representation of device key displays (display_status).
         
-        Passes icon data to either the device or dev state.
+        Pushes icon data to the device (or developer display).
 
         Parameters
         ----------
@@ -573,6 +583,8 @@ class ElGateau(object):
 
     def dev_display_init(self):
         """
+        Low-level function not intended to be called directly.
+
         Generate the initial display_state image.
         Only works if in developer mode.
         """
@@ -594,7 +606,8 @@ class ElGateau(object):
         ico = padded_im
         
         # concatenate array of icons
-        display_state = Image.new('RGB', (ico.size[0]*NUM_KEYS_ROW, ico.size[1]*int(NUM_KEYS/NUM_KEYS_ROW)))
+        display_state = Image.new('RGB', (ico.size[0]*NUM_KEYS_ROW, 
+                                          ico.size[1]*int(NUM_KEYS/NUM_KEYS_ROW)))
         for r in range(0,int(NUM_KEYS/NUM_KEYS_ROW)):
             for c in range(0,NUM_KEYS_ROW):
                 display_state.paste(ico,(ico.size[0]*c,ico.size[1]*r))
@@ -604,6 +617,8 @@ class ElGateau(object):
 
     def dev_display_icon(self, key, icon, remap=True):
         """
+        Low-level function not intended to be called directly.
+
         Update the current display state.
         Analagous to display_icon.
         """
