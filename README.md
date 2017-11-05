@@ -9,8 +9,7 @@ The Elgato Stream Deck is effectively a USB interface device with an rray of 3x5
 
 ### Current Functionality
 
-Tested in Windows 10.
-(Later will test in Mac OS X 10.11.)
+Tested in Windows 10 and Mac OS X 10.11.
 
 - Basic device interaction
 	* Open a USB I/O connection to the Stream Deck device (`ElGateau()`)
