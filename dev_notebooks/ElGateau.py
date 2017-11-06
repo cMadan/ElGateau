@@ -18,7 +18,7 @@ __author__ = "Christopher Madan"
 __copyright__ = "Copyright 2017, Christopher Madan"
 
 __license__ = "MIT"
-__version__ = "0.6.4"
+__version__ = "0.6.5"
 __maintainer__ = "Christopher Madan"
 __email__ = "christopher.madan@nottingham.ac.uk"
 __status__ = "Development"
@@ -395,13 +395,13 @@ class ElGateau(object):
             # list(range) works, but is slow
             # let's be more responsive
             self.reset()
-			# reset works with device and dev_mode
+            # reset works with device and dev_mode
             self.display_clear(1)
             keys = list(range(1,16))
             for k in keys:
                 self.display_update(k, self.key_blank, display=False)
-				# we want to update display_status, but not push to device
-			return
+                # we want to update display_status, but not push to device
+            return
 
         if not rc:
             if isinstance(keys, int):
@@ -442,14 +442,14 @@ class ElGateau(object):
 
         # remap the key locations
         key = self.key_remap(key)
-		
-		# if not, will update display_status, but not actual device/display_state
-		if display:
-			# push to device
-			if not self.dev_mode:
-				self.display_icon(key, icon, remap=False)  # already remapped!
-			elif self.dev_mode:
-				self.dev_display_icon(key, icon, remap=False)
+
+        # if not, will update display_status, but not actual device/display_state
+        if display:
+            # push to device
+            if not self.dev_mode:
+                self.display_icon(key, icon, remap=False)  # already remapped!
+            elif self.dev_mode:
+                self.dev_display_icon(key, icon, remap=False)
 
     ########################################
     #
@@ -607,7 +607,7 @@ class ElGateau(object):
                               int((padded_size[1]-ico.size[1])/2)))
         ico = padded_im
         # pad with very dark gray border (space between icons), but not quite black
-		# border can help us detect that click is on actual key, not border
+        # border can help us detect that click is on actual key, not border
         pad = 6
         padded_size = ico.size[0]+pad, ico.size[1]+pad
         padded_im = Image.new("RGBA", padded_size, (1, 1, 1, 255))
@@ -624,8 +624,8 @@ class ElGateau(object):
         
         # pass back to self
         self.display_state = display_state
-		# also store blank display_state
-		self.display_state_init = display_state
+        # also store blank display_state
+        self.display_state_init = display_state
 
     def dev_display_icon(self, key, icon, remap=True):
         """
