@@ -284,7 +284,7 @@ class ElGateau(object):
         if not self.dev_mode:
             self.device.send_feature_report(RESET_DATA)
         elif self.dev_mode:
-            self.display_clear('all')
+            self.display_state = self.display_state_init
 
     def set_brightness(self, bright):
         """
@@ -392,15 +392,16 @@ class ElGateau(object):
             E.g., ((1,1),(1,4),(3,2))
         """
         if keys == 'all':
-            if not self.dev_mode:
-                # list(range) works, but is slow
-                # let's be more responsive
-                self.reset()
-                self.display_clear(1)
-                return
-            elif self.dev_mode:
-                keys = list(range(1,16))
-                # if not in dev_mode, reset is faster than looping through keys
+            # list(range) works, but is slow
+            # let's be more responsive
+            self.reset()
+			# reset works with device and dev_mode
+            self.display_clear(1)
+            keys = list(range(1,16))
+            for k in keys:
+                self.display_update(k, self.key_blank, display=False)
+				# we want to update display_status, but not push to device
+			return
 
         if not rc:
             if isinstance(keys, int):
@@ -415,7 +416,7 @@ class ElGateau(object):
             for k in keys:
                 self.display_update(k, self.key_blank)
 
-    def display_update(self, key, icon):
+    def display_update(self, key, icon, display=True):
         """
         Updates device key displays as well as
         internal representation of device key displays (display_status).
@@ -441,12 +442,14 @@ class ElGateau(object):
 
         # remap the key locations
         key = self.key_remap(key)
-
-        # push to device
-        if not self.dev_mode:
-            self.display_icon(key, icon, remap=False)  # already remapped!
-        elif self.dev_mode:
-            self.dev_display_icon(key, icon, remap=False)
+		
+		# if not, will update display_status, but not actual device/display_state
+		if display:
+			# push to device
+			if not self.dev_mode:
+				self.display_icon(key, icon, remap=False)  # already remapped!
+			elif self.dev_mode:
+				self.dev_display_icon(key, icon, remap=False)
 
     ########################################
     #
@@ -603,10 +606,11 @@ class ElGateau(object):
         padded_im.paste(ico, (int((padded_size[0]-ico.size[0])/2),
                               int((padded_size[1]-ico.size[1])/2)))
         ico = padded_im
-        # pad with black border (space between icons)
+        # pad with very dark gray border (space between icons), but not quite black
+		# border can help us detect that click is on actual key, not border
         pad = 6
         padded_size = ico.size[0]+pad, ico.size[1]+pad
-        padded_im = Image.new("RGBA", padded_size, (0, 0, 0, 255))
+        padded_im = Image.new("RGBA", padded_size, (1, 1, 1, 255))
         padded_im.paste(ico, (int((padded_size[0]-ico.size[0])/2),
                               int((padded_size[1]-ico.size[1])/2)))
         ico = padded_im
@@ -620,6 +624,8 @@ class ElGateau(object):
         
         # pass back to self
         self.display_state = display_state
+		# also store blank display_state
+		self.display_state_init = display_state
 
     def dev_display_icon(self, key, icon, remap=True):
         """
