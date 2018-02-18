@@ -35,15 +35,20 @@ Tested in Windows 10 and Mac OS X 10.11.
 		+ Includes some generic `label` information (image/solid/text) that gets passed on to `ElGateau.display_status` as well as specific `contents` information such as icon filenames, hex color code for solid colors, or text strings
 	* Remap the key numbering to be more intuitive (`ElGateau.key_remap`), can use either a 1-15 numbering, or a (row,column) notation (not fully implemented on display and button listen functions yet)
 	* Conversion of hex color strings (e.g., `E5E5E5`) to RGB tuples (`hex2rgb`)
+	* Developer mode for demonstrating experiments without the device needed (`ElGateau(dev_mode=True)`)
+		+ Developed using QT5 to build the interface as an interactive figure in Jupyter notebook (`%matplotlib qt5`)
 
+- Demo experiments
+	* Color name-hue matching task (`demo_colours`)
+		+ Simple experiment using just mainly solid colors
+		+ Has a 'flickering' animation for each trial
+	* 'Devil' risk-taking task (`demo_deviltask`)
+		+ Only uses characters from an emoji/unicode font (no pictures)
+	
 
 ### Coming Soon
 
-- Demo experiments
-
-- Jupyter notebooks with test code [ IN PROGRESS ]
-
-- Developer mode, that doesn't require the device to be connected, with I/O through Jupyter notebook [ IN PROGRESS ]
+- More demo experiments
 
 - Logging (in-line with experimental psychology needs)
 	* Not automatically, just a convenience class, like `Icon`
