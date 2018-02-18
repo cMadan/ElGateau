@@ -15,7 +15,7 @@ import hid
 from PIL import Image, ImageDraw, ImageFont
 
 __author__ = "Christopher Madan"
-__copyright__ = "Copyright 2017, Christopher Madan"
+__copyright__ = "Copyright 2017-2018, Christopher Madan"
 
 __license__ = "MIT"
 __version__ = "0.7.0"
@@ -284,7 +284,7 @@ class ElGateau(object):
         if not self.dev_mode:
             self.device.send_feature_report(RESET_DATA)
         elif self.dev_mode:
-            self.display_state = self.display_state_init
+            self.display_state = self.display_state_init.copy()
 
     def set_brightness(self, bright):
         """
@@ -643,12 +643,13 @@ class ElGateau(object):
         # pass back to self
         self.display_state = display_state
         # also store blank display_state
-        self.display_state_init = display_state
+        # copy contents (deep copy), not reference
+        self.display_state_init = display_state.copy()
 
         # init the mpl figure
         self.fig = self.plt.figure()
         self.plt.axis('off')
-        self.plt.imshow(self.display_state, interpolation='sinc')
+        self.imshow = self.plt.imshow(self.display_state, interpolation='sinc')
         
         #
         self.click = []
@@ -676,7 +677,8 @@ class ElGateau(object):
         self.display_state.paste(ico,((ico.size[0]+8)*c+4,(ico.size[1]+8)*r+4))
 
         # redraw plt
-        self.plt.imshow(self.display_state, interpolation='sinc')
+        self.plt.pause(.1)
+        self.imshow.set_data(self.display_state)
 
     def dev_button_getch(self):
         """
@@ -687,7 +689,6 @@ class ElGateau(object):
         # wait for button press
         self.plt.ginput(1)
         # convert from (x,y) to (r,c) to key
-        print(self.click)
         r = int(np.floor(self.click[0][1]/80))+1
         c = int(np.floor(self.click[0][0]/80))+1
         key = (r, c)
