@@ -18,7 +18,7 @@ __author__ = "Christopher Madan"
 __copyright__ = "Copyright 2017, Christopher Madan"
 
 __license__ = "MIT"
-__version__ = "0.6.5"
+__version__ = "0.7.0"
 __maintainer__ = "Christopher Madan"
 __email__ = "christopher.madan@nottingham.ac.uk"
 __status__ = "Development"
@@ -474,23 +474,26 @@ class ElGateau(object):
         key : int, Key number on device (1-15)
         time  : tuple, Unix time of key [0] button press and [1] button release
         """
-        if not self.dev_mode:
-            # wait for button press
-            state = self.device.read(NUM_KEYS+1)
-            key = np.where(np.array(state) == 1)
-            key = int(key[0][1])
-            if remap:
-                key = self.key_remap(key)
-            time_press = time.time()
-    
-            # wait for release
-            state = self.device.read(NUM_KEYS+1)
-            if len(np.where(np.array(state) == 1)) > 1:
-                # no keys currently pressed
-                raise ValueError('Unexpected getch state.')
-            time_release = time.time()
-    
-            return (key, (time_press, time_release))
+        # wait for button press
+        state = self.device.read(NUM_KEYS+1, timeout_ms=timeout)
+        key = np.where(np.array(state) == 1)
+        #if np.size(key) == 1:
+        # this shouldn't end up being one... but it happens sometimes
+        #key = 0
+        #else:
+        key = int(key[0][1])
+        if remap:
+            key = self.key_remap(key)
+        time_press = time.time()
+
+        # wait for release
+        state = self.device.read(NUM_KEYS+1)
+        if len(np.where(np.array(state) == 1)) > 1:
+            # no keys currently pressed
+            raise ValueError('Unexpected getch state.')
+        time_release = time.time()
+
+        return (key, (time_press, time_release))
 
     def button_empty(self, timeout=5):
         """
@@ -501,10 +504,13 @@ class ElGateau(object):
         ----------
         timeout : int, How many ms to wait for device. Optional.
         """
-        state = [0]
-        while len(state) > 0:
-            # hid.device.read has a timeount parameter!!
-            state = self.device.read(NUM_KEYS+1, timeout_ms=timeout)
+        if not self.dev_mode:
+            state = [0]
+            while len(state) > 0:
+                # hid.device.read has a timeount parameter!!
+                state = self.device.read(NUM_KEYS+1, timeout_ms=timeout)
+        elif self.dev_mode:
+            self.dev_button_empty()
 
     def button_listen_key(self, keys, rc=False):
         """
@@ -538,7 +544,10 @@ class ElGateau(object):
             if isinstance(keys, int):
                 keys = (keys,)
             while button not in keys:
-                button, button_time = self.button_getch()
+                if not self.dev_mode:
+                    button, button_time = self.button_getch()
+                elif self.dev_mode:
+                    button, button_time = self.dev_button_getch()
 
         elif rc:
             # not implemented yet
@@ -575,7 +584,10 @@ class ElGateau(object):
         # listen
         # stop after 'count' presses
         while count_i < count:
-            button, button_time = self.button_getch()
+            if not self.dev_mode:
+                button, button_time = self.button_getch()
+            elif self.dev_mode:
+                button, button_time = self.dev_button_getch()
             key_list.append(button)
             rt_list.append(button_time[0]-time_start)
             count_i += 1
@@ -586,7 +598,8 @@ class ElGateau(object):
     #
     # Developer mode functions
     #
-    # dev_display_init, dev_display_update
+    # dev_display_init, dev_display_update,
+    # dev_button_getch, dev_button_empty
     #
     ########################################
 
@@ -595,8 +608,13 @@ class ElGateau(object):
         Low-level function not intended to be called directly.
 
         Generate the initial display_state image.
+
         Only works if in developer mode.
         """
+        # import mpl, but only of working in dev_mode
+        import matplotlib.pyplot as plt
+        self.plt = plt
+
         # make single blank key
         ico = Image.new("RGBA", ICON_SIZE, (0, 0, 0, 255))
         # pad with white border
@@ -621,11 +639,17 @@ class ElGateau(object):
         for r in range(0,int(NUM_KEYS/NUM_KEYS_ROW)):
             for c in range(0,NUM_KEYS_ROW):
                 display_state.paste(ico,(ico.size[0]*c,ico.size[1]*r))
-        
+
         # pass back to self
         self.display_state = display_state
         # also store blank display_state
         self.display_state_init = display_state
+
+        # init the mpl figure
+        self.fig = self.plt.figure()
+        self.plt.axis('off')
+        self.plt.imshow(self.display_state, interpolation='sinc')
+        self.key_state = []
 
     def dev_display_icon(self, key, icon, remap=True):
         """
@@ -633,6 +657,8 @@ class ElGateau(object):
 
         Update the current display state.
         Analagous to display_icon.
+
+        Only works if in developer mode.
         """
         ico = icon['ico']
         if remap:
@@ -640,3 +666,42 @@ class ElGateau(object):
         r = int(np.floor((key-1)/NUM_KEYS_ROW))
         c = int(np.mod(NUM_KEYS_ROW-key, NUM_KEYS_ROW))
         self.display_state.paste(ico,((ico.size[0]+8)*c+4,(ico.size[1]+8)*r+4))
+
+        # redraw plt
+        self.plt.imshow(self.display_state, interpolation='sinc')
+
+    def dev_button_getch(self):
+        """
+        Wait for next button press in dev_mode.
+
+        Only works if in developer mode.
+        """
+        # wait for button press
+        self.plt.ginput(1)
+        # convert from (x,y) to (r,c) to key
+        r = int(np.floor(click_xy[0][1]/80))+1
+        c = int(np.floor(click_xy[0][0]/80))+1
+        key = (r, c)
+        # convert from (r,c) to 1-15
+        key = self.key_remap(key)
+        # convert to device notation, then back to intuitive 1-15
+        key = self.key_remap(key)
+            
+        # empty state again
+        self.dev_button_empty()
+        time_press = time.time()
+
+        # wait for release
+        # separate release not implemented here...
+        # can this be implemented?
+        time_release = time.time()
+
+        return (key, (time_press, time_release))
+
+    def dev_button_empty(self):
+        """
+        Empty buffer for key_state.
+
+        Only works if in developer mode.
+        """
+        self.key_state = []
