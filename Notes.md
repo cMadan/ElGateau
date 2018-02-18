@@ -28,12 +28,6 @@
 
 	- Make a boot function (open, reset, draw {cake, 'ElGateau','cMadan',version}, some screen test, clear displays)
 
-1. Work on 'developer mode'
-	- Display works, now work on button presses
-		+ Best option is an interactive figure in Jupyter with mpl?
-			+ Can I do imports based on if-statement and still be good with PEP8 ?
-
-
 1. Reorganize useful links from above (other APIs, fonts) into a useful list
 
 1. Make simple proof-of-principle 'experiments'
