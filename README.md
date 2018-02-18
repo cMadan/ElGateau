@@ -23,7 +23,7 @@ Tested in Windows 10 and Mac OS X 10.11.
 		+ This 'virtual display' can be accessed at any time as `ElGateau.display_state`
 			- This virtual display is only maintained if in developer mode, as it otherwise is unneeded and would slow interactions with the Stream Deck device
 
-- Listen for key button presses (`ElGateau.button_listen`) [NOT IMPLEMENTED YET]
+- Listen for key button presses (`ElGateau.button_listen_key`)
 	* This function wraps around 'low-level' interaction with the device (`ElGateau.button_getch`)
 	* Also 'high-level' button listening for either specifed key(s) to be pressed (`ElGateau.button_listen_key`) or a number of key presses (`ElGateau.button_listen_count`)
 
@@ -41,11 +41,12 @@ Tested in Windows 10 and Mac OS X 10.11.
 
 - Demo experiments
 
-- Jupyter notebooks with test code
+- Jupyter notebooks with test code [ IN PROGRESS ]
 
-- Developer mode, that doesn't require the device to be connected, with I/O through Jupyter notebook
+- Developer mode, that doesn't require the device to be connected, with I/O through Jupyter notebook [ IN PROGRESS ]
 
 - Logging (in-line with experimental psychology needs)
+	* Not automatically, just a convenience class, like `Icon`
 
 For current (unpolished) notes on the status of the project, see [Notes.md](Notes.md)
 
