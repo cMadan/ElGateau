@@ -649,7 +649,15 @@ class ElGateau(object):
         self.fig = self.plt.figure()
         self.plt.axis('off')
         self.plt.imshow(self.display_state, interpolation='sinc')
-        self.key_state = []
+        
+        #
+        self.click = []
+        def on_click(event):
+            '''Capture the x,y coordinates of a mouse click on the image'''
+            ix, iy = event.xdata, event.ydata
+            self.click.append([ix, iy])
+
+        connectId = self.fig.canvas.mpl_connect('button_press_event', on_click)
 
     def dev_display_icon(self, key, icon, remap=True):
         """
@@ -679,8 +687,9 @@ class ElGateau(object):
         # wait for button press
         self.plt.ginput(1)
         # convert from (x,y) to (r,c) to key
-        r = int(np.floor(click_xy[0][1]/80))+1
-        c = int(np.floor(click_xy[0][0]/80))+1
+        print(self.click)
+        r = int(np.floor(self.click[0][1]/80))+1
+        c = int(np.floor(self.click[0][0]/80))+1
         key = (r, c)
         # convert from (r,c) to 1-15
         key = self.key_remap(key)
@@ -700,8 +709,8 @@ class ElGateau(object):
 
     def dev_button_empty(self):
         """
-        Empty buffer for key_state.
+        Empty buffer for mouse clicks.
 
         Only works if in developer mode.
         """
-        self.key_state = []
+        self.click = []
