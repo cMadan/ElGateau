@@ -80,7 +80,7 @@
 - https://github.com/Lange/node-elgato-stream-deck
 - https://github.com/danieltian/stream-deck-api
 
-- https://github.com/OpenStreamDeck/StreamDeckSharp
+- https://github.com/OpenMacroBoard/StreamDeckSharp
 
 - https://github.com/Number10Ox/stream-deck-driver
 - https://github.com/GalacticGlum/StreamDeck
