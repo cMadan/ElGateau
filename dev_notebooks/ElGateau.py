@@ -18,7 +18,7 @@ __author__ = "Christopher Madan"
 __copyright__ = "Copyright 2017-2018, Christopher Madan"
 
 __license__ = "MIT"
-__version__ = "0.7.0"
+__version__ = "0.8.0"
 __maintainer__ = "Christopher Madan"
 __email__ = "christopher.madan@nottingham.ac.uk"
 __status__ = "Development"
@@ -214,6 +214,63 @@ class Icon(object):
 #
 #
 
+class Log(object):
+    """
+    Logging for ElGateau.
+    """
+    
+    # functions
+
+    ########################################
+    #
+    # Logging functions
+    #
+    # open, save, record_display, record_press, record_event
+    #
+    ########################################
+    
+    def __init__(self,filename):
+        """
+        Open logging file.
+        """
+        # append, not overwrite
+        self.f = open(filename+'.log','a+')
+        self.record_event(filename,'f')
+        self.record_event('Logging Begins','f')
+    
+    def __enter__(self):
+        return self
+        
+    def close(self):
+        """
+        Close log file.
+        """
+        self.record_event('Logging Ends','f')
+        self.f.close()
+        
+    def record_display(self,key,icon):
+        """
+        Record the update of a key's display.
+        """
+        # .replace('\n','_')
+        # don't allow new lines to be written to log through this
+        self.f.write('{}\t{}\t{}\t{}\n'.format(round(time.time()*1000),'d',key,icon['contents'].replace('\n','_')))
+        
+    def record_press(self,key,rt):
+        """
+        Record the press of a key.
+        """
+        self.f.write('{}\t{}\t{}\t{}\n'.format(round(time.time()*1000),'p',key,round(rt*1000)))
+        
+    def record_event(self,text,code='e'):
+        """
+        Record custom event.
+        """
+        self.f.write('{}\t{}\t{}\t{}\n'.format(round(time.time()*1000),code,0,text))        
+    
+#
+#
+
 class ElGateau(object):
     """
     ElGateau:
@@ -231,7 +288,7 @@ class ElGateau(object):
     #
     ########################################
 
-    def __init__(self, dev_mode=False):
+    def __init__(self, dev_mode=False, log=None):
         """
         Open initial connection to Elgato Stream Deck device
         and sets up initial variables.
@@ -266,7 +323,14 @@ class ElGateau(object):
             # send a reset command, 
             # otherwise display may have icons from a previous instance
             self.reset()
-
+            
+        # begin logging if requested
+        if log is None:
+            # no log file specified, so no logging occuring
+            print('Warning: Not currently logging events.')
+        else:
+            # begin logging record
+            self.Log = Log(log)
 
     def __enter__(self):
         return self
@@ -450,6 +514,10 @@ class ElGateau(object):
                 self.display_icon(key, icon, remap=False)  # already remapped!
             elif self.dev_mode:
                 self.dev_display_icon(key, icon, remap=False)
+        
+        # if logging, make a record
+        if hasattr(self,'Log'):
+            self.Log.record_display(key,icon)
 
     ########################################
     #
@@ -492,6 +560,10 @@ class ElGateau(object):
             # no keys currently pressed
             raise ValueError('Unexpected getch state.')
         time_release = time.time()
+        
+        # if logging, make a record
+        if hasattr(self,'Log'):
+            self.Log.record_press(key,time_release-time_press)
 
         return (key, (time_press, time_release))
 
