@@ -18,10 +18,10 @@ __author__ = "Christopher Madan"
 __copyright__ = "Copyright 2017-2018, Christopher Madan"
 
 __license__ = "MIT"
-__version__ = "0.9.0"
+__version__ = "0.9.1"
 __maintainer__ = "Christopher Madan"
 __email__ = "christopher.madan@nottingham.ac.uk"
-__status__ = "Development"
+__status__ = "Production"
 
 # define constants
 HID_VENDOR = 4057
@@ -358,7 +358,7 @@ class ElGateau(object):
             
         # if logging, make a record
         if hasattr(self,'Log'):
-            self.Log.record_event(0,'display reset','d')
+            self.Log.record_event('display reset','d')
             
     def boot(self):
         """
