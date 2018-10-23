@@ -37,7 +37,8 @@ Tested in Windows 10 and Mac OS X 10.11.
 	* Conversion of hex color strings (e.g., `E5E5E5`) to RGB tuples (`hex2rgb`)
 	* Developer mode for demonstrating experiments without the device needed (`ElGateau(dev_mode=True)`)
 		+ Developed using QT5 to build the interface as an interactive figure in Jupyter notebook (`%matplotlib qt5`)
-
+	* Optional automatically logging, as well as option to add custom events to log (`ElGateau(log)`)
+		
 - Demo experiments
 	* Color name-hue match-to-sample task (`demo_colours`)
 		+ Simple experiment using only solid colors and text
@@ -48,12 +49,8 @@ Tested in Windows 10 and Mac OS X 10.11.
 		+ Uses icon pictures
 		+ Variable task length, based on performance
 
+		
 ### Coming Soon
-
-- More demo experiments
-
-- Logging (in-line with experimental psychology needs)
-	* Not automatically, just a convenience class, like `Icon`
 
 For current (unpolished) notes on the status of the project, see [Notes.md](Notes.md)
 

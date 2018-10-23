@@ -45,6 +45,7 @@ HEADER_PAGE1 = [2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66, 77, 246,
 
 HEADER_PAGE2 = [2, 1, 2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
+
 def hex2rgb(col):
     """
     Convert from hex color string to RGB tuple.
@@ -214,6 +215,7 @@ class Icon(object):
 #
 #
 
+
 class Log(object):
     """
     Logging for ElGateau.
@@ -271,6 +273,7 @@ class Log(object):
 #
 #
 
+
 class ElGateau(object):
     """
     ElGateau:
@@ -288,7 +291,7 @@ class ElGateau(object):
     #
     ########################################
 
-    def __init__(self, dev_mode=False, log=None):
+    def __init__(self, dev_mode=False, log=None, do_boot=True):
         """
         Open initial connection to Elgato Stream Deck device
         and sets up initial variables.
@@ -331,6 +334,9 @@ class ElGateau(object):
         else:
             # begin logging record
             self.Log = Log(log)
+           
+        if do_boot:
+            self.boot()
 
     def __enter__(self):
         return self
@@ -349,7 +355,16 @@ class ElGateau(object):
             self.device.send_feature_report(RESET_DATA)
         elif self.dev_mode:
             self.display_state = self.display_state_init.copy()
-
+            
+    def boot(self):
+        """
+        Send boot screen for ElGateau.
+        """
+        self.reset()
+        self.display_update(1, Icon.prep('cake', 300))
+        self.display_update(2, Icon.text('ElGateau', size=20))
+        self.display_update(5, Icon.text('ElGateau', size=20))
+            
     def set_brightness(self, bright):
         """
         Set brightness of displays.
@@ -561,10 +576,6 @@ class ElGateau(object):
             raise ValueError('Unexpected getch state.')
         time_release = time.time()
         
-        # if logging, make a record
-        if hasattr(self,'Log'):
-            self.Log.record_press(key,time_release-time_press)
-
         return (key, (time_press, time_release))
 
     def button_empty(self, timeout=5):
@@ -627,6 +638,10 @@ class ElGateau(object):
 
         # only output the button press time
         response_time = button_time[0]-time_start
+
+        # if logging, make a record
+        if hasattr(self,'Log'):
+            self.Log.record_press(button,response_time)
 
         return (button, response_time)
 
