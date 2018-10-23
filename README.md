@@ -45,12 +45,14 @@ Tested in Windows 10 and Mac OS X 10.11.
 		+ Has a 'flickering' animation for each trial
 	* 'Devil' risk-taking task (`demo_deviltask`)
 		+ Only uses characters from an emoji/unicode font (no picture files)
-	* Memory game, iterative delayed-match-to-sample (`demo_memorygame')
+	* Memory game, iterative delayed-match-to-sample (`demo_memorygame`)
 		+ Uses icon pictures
 		+ Variable task length, based on performance
 
 		
-### Coming Soon
+### Next steps
+
+- Separate config file, get subject number with sys.argv, else can be passed in init call?
 
 For current (unpolished) notes on the status of the project, see [Notes.md](Notes.md)
 
