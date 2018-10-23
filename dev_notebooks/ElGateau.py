@@ -18,7 +18,7 @@ __author__ = "Christopher Madan"
 __copyright__ = "Copyright 2017-2018, Christopher Madan"
 
 __license__ = "MIT"
-__version__ = "0.8.0"
+__version__ = "0.9.0"
 __maintainer__ = "Christopher Madan"
 __email__ = "christopher.madan@nottingham.ac.uk"
 __status__ = "Development"
@@ -256,7 +256,7 @@ class Log(object):
         """
         # .replace('\n','_')
         # don't allow new lines to be written to log through this
-        self.f.write('{}\t{}\t{}\t{}\n'.format(round(time.time()*1000),'d',key,icon['contents'].replace('\n','_')))
+        self.f.write('{}\t{}\t{}\t{}\n'.format(round(time.time()*1000),'d',key,icon['label']+' '+icon['contents'].replace('\n','_')))
         
     def record_press(self,key,rt):
         """
@@ -356,14 +356,21 @@ class ElGateau(object):
         elif self.dev_mode:
             self.display_state = self.display_state_init.copy()
             
+        # if logging, make a record
+        if hasattr(self,'Log'):
+            self.Log.record_event(0,'display reset','d')
+            
     def boot(self):
         """
         Send boot screen for ElGateau.
         """
         self.reset()
         self.display_update(1, Icon.prep('cake', 300))
-        self.display_update(2, Icon.text('ElGateau', size=20))
-        self.display_update(5, Icon.text('ElGateau', size=20))
+        self.display_update(2, Icon.text('ElGateau', size=12))
+        self.display_update(5, Icon.text(__author__.replace(' ','\n'), size=10))
+        self.display_update(3, Icon.text('v '+__version__, size=12))
+        time.sleep(5)
+        self.display_clear('all')
             
     def set_brightness(self, bright):
         """
