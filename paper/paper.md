@@ -1,5 +1,5 @@
 ---
-title: 'ElGateau: A Framework for Using the Elgato Stream Deck for Experimental Psychology Research'
+title: 'ElGateau: A Library for Using the Elgato Stream Deck for Experimental Psychology Research'
 tags:
   - psychology
   - experiments

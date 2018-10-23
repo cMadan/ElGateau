@@ -2,7 +2,7 @@
 
 """
 ElGateau:
-A Framework for Using the Elgato Stream Deck
+A Library for Using the Elgato Stream Deck
 for Experimental Psychology Research
 """
 
@@ -277,7 +277,7 @@ class Log(object):
 class ElGateau(object):
     """
     ElGateau:
-    A Framework for Using the Elgato Stream Deck
+    A Library for Using the Elgato Stream Deck
     for Experimental Psychology Research
     """
 
