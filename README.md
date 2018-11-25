@@ -7,6 +7,14 @@ The Elgato Stream Deck is effectively a USB interface device with an array of 3x
 
 ![Elgato Stream Deck](https://cdn.vox-cdn.com/uploads/chorus_image/image/54298497/91fukDTbNVL._SL1500_.0.jpg)
 
+### Install instructions
+
+Clone the repo, download it, or use pip!
+
+`pip install ElGateau`
+
+[https://pypi.org/project/ElGateau/]
+
 ### Current Functionality
 
 Tested in Windows 10, Mac OS X (10.11 and 10.13), and Linux (Ubuntu 18.10)
@@ -56,7 +64,6 @@ Tested in Windows 10, Mac OS X (10.11 and 10.13), and Linux (Ubuntu 18.10)
 - Separate config file, get subject number with sys.argv, else can be passed in init call?
 - Test dev_mode functionality outside of Jupyter
 - Test integration with PsychoPy
-- Work out how to install with pip
 
 For current (unpolished) notes on the status of the project, see [Notes.md](Notes.md)
 

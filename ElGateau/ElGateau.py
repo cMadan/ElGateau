@@ -18,7 +18,7 @@ __author__ = "Christopher Madan"
 __copyright__ = "Copyright 2017-2018, Christopher Madan"
 
 __license__ = "MIT"
-__version__ = "0.9.2"
+__version__ = "1.0.0"
 __maintainer__ = "Christopher Madan"
 __email__ = "christopher.madan@nottingham.ac.uk"
 __status__ = "Production"
