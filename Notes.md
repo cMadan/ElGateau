@@ -20,5 +20,3 @@
 1. Write up basic docs
 	- badges from shields.io
 		+ Python 3
-
-1. Write as short paper for JOSS? If not, maybe F1000Research?

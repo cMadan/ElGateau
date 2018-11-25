@@ -9,7 +9,7 @@ The Elgato Stream Deck is effectively a USB interface device with an array of 3x
 
 ### Current Functionality
 
-Tested in Windows 10 and Mac OS X 10.11.
+Tested in Windows 10, Mac OS X (10.11 and 10.13), and Linux (Ubuntu 18.10)
 
 - Basic device interaction
 	* Open a USB I/O connection to the Stream Deck device (`ElGateau()`)
@@ -52,7 +52,11 @@ Tested in Windows 10 and Mac OS X 10.11.
 		
 ### Next steps
 
+- Update Readme with JOSS paper info
 - Separate config file, get subject number with sys.argv, else can be passed in init call?
+- Test dev_mode functionality outside of Jupyter
+- Test integration with PsychoPy
+- Work out how to install with pip
 
 For current (unpolished) notes on the status of the project, see [Notes.md](Notes.md)
 
