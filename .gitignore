@@ -1,2 +1,6 @@
 __pycache__
 .ipynb_checkpoints
+# setup.py related, for pip
+ElGateau.egg-info
+dist
+build
