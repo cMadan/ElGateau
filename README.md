@@ -1,3 +1,7 @@
+[![Python Versions](https://img.shields.io/pypi/pyversions/ElGateau.svg)](https://pypi.org/project/ElGateau/)
+[![Package versioning](https://img.shields.io/pypi/v/ElGateau.svg)](https://pypi.org/project/ElGateau/)
+[![PyPI license](https://img.shields.io/pypi/l/ElGateau.svg)](https://pypi.org/project/ElGateau/)
+
 # ElGateau
 #### ElGateau: A Library for Using the Elgato Stream Deck for Experimental Psychology Research
 
@@ -12,8 +16,6 @@ The Elgato Stream Deck is effectively a USB interface device with an array of 3x
 Clone the repo, download it, or use pip!
 
 `pip install ElGateau`
-
-[https://pypi.org/project/ElGateau/]
 
 ### Current Functionality
 
