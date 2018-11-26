@@ -18,7 +18,7 @@ __author__ = "Christopher Madan"
 __copyright__ = "Copyright 2017-2018, Christopher Madan"
 
 __license__ = "MIT"
-__version__ = "1.0.0"
+__version__ = "1.0.2"
 __maintainer__ = "Christopher Madan"
 __email__ = "christopher.madan@nottingham.ac.uk"
 __status__ = "Production"
@@ -109,24 +109,34 @@ class Icon(object):
         icon['contents'] = col
         return icon
 
-    def prep(filename, pad=0):
+    def prep(filename, pad=0, external_file=False):
         """
         Prepare icon (read from file, pad, resize).
 
         Parameters
         ----------
-        filename : Filename for icon to prepare,
-                   needs to be a PNG in the "icons" folder.
-        bright : px
+        filename : Filename for icon to prepare.
+                   Ordinarily expects a PNG in the "icons" folder. 
+                   Otherwise, see external_file.
+        pad : px
             Pad the icon before resizing, this way the icon
             doesn't go right to edge of display.
+            
+        external_file : If False, filename is expected to be in 
+                        "icons" folder relative to ElGateau.py.
+                        If True, filename should be path relative 
+                        to experiment.
 
         Returns
         ----------
         icon : Icon object (from Icon class)
         """
         # read icon
-        ico = Image.open(os.path.join(os.path.dirname(os.path.abspath(__file__)),"icons", filename+".png"))
+        if external_file == True:
+            ico = Image.open(filename)
+        else:
+            # if the icon is in the 'icon' folder
+            ico = Image.open(os.path.join(os.path.dirname(os.path.abspath(__file__)),"icons", filename+".png"))
 
         if pad != 0:
             # pad with blank space if don't know
@@ -146,7 +156,8 @@ class Icon(object):
         return icon
 
     def text(text, ico=None, col='ffffff', back='000000',
-             font='VeraMono-Bold', size=14, position=(31, 31)):
+             font='VeraMono-Bold', size=14, position=(31, 31),
+             external_file=False):
         """
         Overlay text over icon.
 
@@ -154,19 +165,31 @@ class Icon(object):
         ----------
         text : str
             Text to write.
+            
         ico : 72x72 RGBA image
             Should have been output from icon_prep or icon_solid.
             Optional, defaults to black background.
+            
         col : Hex color code string for text.
             Optional, defaults to white ('ffffff').
+            
         back : Hex color string for background.
             Optional, defaults to black ('000000').
-        font : Font filename, should be in "fonts" folder.
+            
+        font : Font filename, ordinarily should be in "fonts" folder.
+            Otherwise, see external_file.
             Optional, defaults to VeraMono-Bold.
+            
         size : Font size.
             Optional, defaults to 14.
+            
         position : (int, int), Center of where to draw the text
-
+        
+        external_file : If False (default), filename is expected to be in 
+                        "fonts" folder relative to ElGateau.py.
+                         If True, filename should be path relative 
+                        to experiment.        
+        
         Returns
         ----------
         icon : Icon object (from Icon class)
@@ -185,7 +208,11 @@ class Icon(object):
         txt = Image.new('RGBA', base.size, (255, 255, 255, 0))
 
         # setup font
-        fnt = ImageFont.truetype(os.path.join(os.path.dirname(os.path.abspath(__file__)),"fonts", font+".ttf"), size)
+        if external_file == True:
+            fnt = ImageFont.truetype(font, size)
+        else:
+            fnt = ImageFont.truetype(os.path.join(os.path.dirname(os.path.abspath(__file__)),"fonts", font+".ttf"), size)
+            
         rgb = hex2rgb(col)
         # get a drawing context
         draw = ImageDraw.Draw(txt)
