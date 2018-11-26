@@ -13,9 +13,9 @@ The Elgato Stream Deck is effectively a USB interface device with an array of 3x
 
 ### Install instructions
 
-Clone the repo, download it, or use pip!
+Clone the repo or download it.
 
-`pip install ElGateau`
+- Installation via pip is in development (`pip install ElGateau`)
 
 ### Current Functionality
 
