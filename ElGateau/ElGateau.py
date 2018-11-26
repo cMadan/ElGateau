@@ -126,7 +126,7 @@ class Icon(object):
         icon : Icon object (from Icon class)
         """
         # read icon
-        ico = Image.open(os.path.join("icons", filename+".png"))
+        ico = Image.open(os.path.join(os.path.dirname(os.path.abspath(__file__)),"icons", filename+".png"))
 
         if pad != 0:
             # pad with blank space if don't know
@@ -185,7 +185,7 @@ class Icon(object):
         txt = Image.new('RGBA', base.size, (255, 255, 255, 0))
 
         # setup font
-        fnt = ImageFont.truetype(os.path.join("fonts", font+".ttf"), size)
+        fnt = ImageFont.truetype(os.path.join(os.path.dirname(os.path.abspath(__file__)),"fonts", font+".ttf"), size)
         rgb = hex2rgb(col)
         # get a drawing context
         draw = ImageDraw.Draw(txt)
