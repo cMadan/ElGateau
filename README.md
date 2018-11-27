@@ -1,3 +1,4 @@
+[![DOI](http://joss.theoj.org/papers/10.21105/joss.01070/status.svg)](https://doi.org/10.21105/joss.01070)
 [![Python Versions](https://img.shields.io/pypi/pyversions/ElGateau.svg)](https://pypi.org/project/ElGateau/)
 [![Package versioning](https://img.shields.io/pypi/v/ElGateau.svg)](https://pypi.org/project/ElGateau/)
 [![PyPI license](https://img.shields.io/pypi/l/ElGateau.svg)](https://pypi.org/project/ElGateau/)
@@ -62,7 +63,6 @@ Tested in Windows 10, Mac OS X (10.11 and 10.13), and Linux (Ubuntu 18.10)
 		
 ### Next steps
 
-- Update Readme with JOSS paper info
 - Separate config file, get subject number with sys.argv, else can be passed in init call?
 - Test dev_mode functionality outside of Jupyter
 - Test integration with PsychoPy
@@ -77,7 +77,13 @@ pip install ...
 - Pillow [http://pillow.readthedocs.io/en/latest/index.html]
 	+ This is a Python 3 compatible fork of PIL
 
+### Citing the library
 
+Please cite this paper if you use the library:
+
+* Madan, C. R. (2018). ElGateau: A Library for Using the Elgato Stream Deck for Experimental Psychology Research. *Journal of Open Source Software, 3*, 1070. doi:10.21105/joss.01070
+
+	
 ### Disclaimer
 
 This project is not associated with Elgato Systems GmbH. 
