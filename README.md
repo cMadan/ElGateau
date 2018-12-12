@@ -14,13 +14,15 @@ The Elgato Stream Deck is effectively a USB interface device with an array of 3x
 
 ### Install instructions
 
-Clone the repo or download it.
+#### Option 1:
+Download repository and include `ElGateau.py` in same folder as your Python script, along with `fonts` and `icons` subfolders. (Can include all three in subfolder of your code, e.g., "modules".)
 
-- Installation via pip is in development (`pip install ElGateau`)
+#### Option 2:
+Install via pip (`pip install ElGateau`).
 
 ### Current Functionality
 
-Tested in Windows 10, Mac OS X (10.11 and 10.13), and Linux (Ubuntu 18.10)
+Tested in Windows 10, Mac OS X (10.11 and 10.13), and Linux (Ubuntu 18.10).
 
 - Basic device interaction
 	* Open a USB I/O connection to the Stream Deck device (`ElGateau()`)
